@@ -2,7 +2,7 @@
 The files here deploy a set of objects to make SQL deploys re-runnable and provide customized auditing for code elevations (and other uses).
 
 tables - contains the DDL to create the tables and associated objects
-packages - contains the soruce for all the packages
+packages - contains the source for all the packages
 editioning_view - not used unless EBR is in use
 deploy_scripts - SQL scripts to deploy the objects and also to rollback (remove them)
 
