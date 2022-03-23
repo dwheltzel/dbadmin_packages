@@ -9,7 +9,9 @@ editioning_view - not used unless EBR is in use
 
 deploy_scripts - SQL scripts to deploy the objects and also to rollback (remove them)
 
+
 Deploy scripts:
+
 create_schema - creates the parent schema, DBADMIN, and grants permissions
 
 create_base - installs the tables and packages
