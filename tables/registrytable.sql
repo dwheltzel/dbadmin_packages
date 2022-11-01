@@ -1,9 +1,8 @@
--- File $Id: registrytable.sql 2002 2014-01-03 20:55:45Z dheltzel $
--- Modified $Author: dheltzel $ 
--- Date $Date: 2014-01-03 15:55:45 -0500 (Fri, 03 Jan 2014) $
--- Revision $Revision: 2002 $
+-- File registrytable.sql
+-- Author: dheltzel
+-- Create Date: 2014-01-03
 
-create table DBADMIN.REGISTRYTABLE
+create table REGISTRYTABLE
 (
   NAMESPACE VARCHAR2(30) NOT NULL,
   ENVIR VARCHAR2(30) NOT NULL,
@@ -16,5 +15,5 @@ create table DBADMIN.REGISTRYTABLE
   UPDATE_USER VARCHAR2(30) default USER
 );
 
-comment on table DBADMIN.REGISTRYTABLE is 'Generic Key/value pairs';
+comment on table REGISTRYTABLE is 'Generic Key/value pairs';
 

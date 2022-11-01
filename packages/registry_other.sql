@@ -1,6 +1,5 @@
--- File $Id: registry_other.sql 1419 2013-11-20 20:49:39Z dheltzel $ 
--- Modified $Author: dheltzel $ 
--- Date $Date: 2013-11-20 15:49:39 -0500 (Wed, 20 Nov 2013) $ 
--- Revision $Revision: 1419 $ 
+-- File registry_other.sql
+-- Author: dheltzel
+-- Create Date 2013-11-20
 
-exec dbadmin.deploy_utils.synonyms_grants('ADMIN', 'REGISTRY', 'PACKAGE')
+exec deploy_utils.synonyms_grants('ADMIN', 'REGISTRY', 'PACKAGE')

@@ -1,15 +1,14 @@
--- File $Id: create_registry.sql 3382 2014-03-19 15:19:37Z dheltzel $
--- Modified $Author: dheltzel $ 
--- Date $Date: 2014-03-19 11:19:37 -0400 (Wed, 19 Mar 2014) $
--- Revision $Revision: 3382 $
+-- create_registry.sql
+-- Author: dheltzel
+-- Last Update 2022-11-01
 
 BEGIN
-  dbadmin.deploy_utils.initialize_deploy('10.40', '$Id: create_registry.sql 3382 2014-03-19 15:19:37Z dheltzel $')
+  deploy_utils.initialize_deploy('10.40', '$Id: create_registry.sql 3382 2014-03-19 15:19:37Z dheltzel $')
 END;
 /
 
 BEGIN
-  dbadmin.deploy_utils.deploy_new_table(p_ticket => 'CRQ-99999', p_table_owner => 'DBADMIN', p_table_name => 'REGISTRYTABLE', p_sql => 'create table DBADMIN.REGISTRYTABLE
+  deploy_utils.deploy_new_table(p_ticket => 'CRQ-99999', p_table_owner => USER, p_table_name => 'REGISTRYTABLE', p_sql => 'create table REGISTRYTABLE
 ( NAMESPACE VARCHAR2(30) not null,
   ENVIR VARCHAR2(30) not null,
   NAME VARCHAR2(30) not null,
@@ -20,11 +19,11 @@ BEGIN
   UPDATE_TS TIMESTAMP(6) default sysdate,
   UPDATE_USER VARCHAR2(30) default USER,
   CONSTRAINT PK_REGISTRYTABLE PRIMARY KEY (NAMESPACE,ENVIR,NAME)
-) ORGANIZATION INDEX', p_comment => 'Generic Key/value pairs');
+)', p_comment => 'Generic Key/value pairs');
 END;
 /
 
-BEGIN dbadmin.audit_pkg.log_ddl_change(p_object_owner => 'DBADMIN', p_object_name => 'REGISTRY', p_object_type => 'PACKAGE', p_parent_name => '', p_ticket => 'CRQ-99999', p_sql_executed => '', p_message => 'Creating package', p_svn_id => '$Id: create_registry.sql 3382 2014-03-19 15:19:37Z dheltzel $'); END;
+BEGIN audit_pkg.log_ddl_change(p_object_owner => USER, p_object_name => 'REGISTRY', p_object_type => 'PACKAGE', p_parent_name => '', p_ticket => 'CRQ-99999', p_sql_executed => '', p_message => 'Creating package', p_svn_id => 'create_registry.sql dheltzel'); END;
 /
 
 @packages/registry_spec.sql

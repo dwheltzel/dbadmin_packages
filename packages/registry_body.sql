@@ -1,18 +1,17 @@
 SET DEFINE OFF
 
-CREATE OR REPLACE PACKAGE BODY dbadmin.registry IS
+CREATE OR REPLACE PACKAGE BODY registry IS
 
-  -- File $Id: registry_body.sql 1419 2013-11-20 20:49:39Z dheltzel $
-  -- Modified $Author: dheltzel $
-  -- Date $Date: 2013-11-20 15:49:39 -0500 (Wed, 20 Nov 2013) $
-  -- Revision $Revision: 1419 $
-  lc_svn_id VARCHAR2(200) := '$Id: registry_body.sql 1419 2013-11-20 20:49:39Z dheltzel $';
+  -- File registry_body.sql
+  -- Author: dheltzel
+  -- Create Date 2013-11-20
+  lc_svn_id VARCHAR2(200) := 'registry_body.sql dheltzel';
 
   lv_proc_name err_log.proc_name%TYPE;
 
   lv_comment err_log.source_file%TYPE := 'Starting';
 
-  pkg_namespace registrytable.namespace%TYPE := 'MAAS360';
+  pkg_namespace registrytable.namespace%TYPE := 'DEFAULT';
 
   pkg_envir registrytable.envir%TYPE := 'A';
 
@@ -22,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY dbadmin.registry IS
     RETURN(pkg_namespace);
   EXCEPTION
     WHEN OTHERS THEN
-      dbadmin.audit_pkg.log_error(lc_svn_id,
+      audit_pkg.log_error(lc_svn_id,
                                 lv_proc_name,
                                 lv_comment,
                                 pkg_namespace,
@@ -38,7 +37,7 @@ CREATE OR REPLACE PACKAGE BODY dbadmin.registry IS
     pkg_namespace := p_namespace;
   EXCEPTION
     WHEN OTHERS THEN
-      dbadmin.audit_pkg.log_error(lc_svn_id,
+      audit_pkg.log_error(lc_svn_id,
                                 lv_proc_name,
                                 lv_comment,
                                 p_namespace,
@@ -51,10 +50,10 @@ CREATE OR REPLACE PACKAGE BODY dbadmin.registry IS
   PROCEDURE clear_namespace IS
   BEGIN
     lv_proc_name  := 'clear_namespace';
-    pkg_namespace := 'MAAS360';
+    pkg_namespace := 'DEFAULT';
   EXCEPTION
     WHEN OTHERS THEN
-      dbadmin.audit_pkg.log_error(lc_svn_id,
+      audit_pkg.log_error(lc_svn_id,
                                 lv_proc_name,
                                 lv_comment,
                                 pkg_namespace,
@@ -70,7 +69,7 @@ CREATE OR REPLACE PACKAGE BODY dbadmin.registry IS
     RETURN(pkg_envir);
   EXCEPTION
     WHEN OTHERS THEN
-      dbadmin.audit_pkg.log_error(lc_svn_id,
+      audit_pkg.log_error(lc_svn_id,
                                 lv_proc_name,
                                 lv_comment,
                                 pkg_envir,
@@ -86,7 +85,7 @@ CREATE OR REPLACE PACKAGE BODY dbadmin.registry IS
     pkg_envir    := p_envir;
   EXCEPTION
     WHEN OTHERS THEN
-      dbadmin.audit_pkg.log_error(lc_svn_id,
+      audit_pkg.log_error(lc_svn_id,
                                 lv_proc_name,
                                 lv_comment,
                                 pkg_envir,
@@ -102,7 +101,7 @@ CREATE OR REPLACE PACKAGE BODY dbadmin.registry IS
     pkg_envir    := 'A';
   EXCEPTION
     WHEN OTHERS THEN
-      dbadmin.audit_pkg.log_error(lc_svn_id,
+      audit_pkg.log_error(lc_svn_id,
                                 lv_proc_name,
                                 lv_comment,
                                 pkg_envir,
@@ -133,7 +132,7 @@ CREATE OR REPLACE PACKAGE BODY dbadmin.registry IS
     RETURN(RESULT);
   EXCEPTION
     WHEN OTHERS THEN
-      dbadmin.audit_pkg.log_error(lc_svn_id,
+      audit_pkg.log_error(lc_svn_id,
                                 lv_proc_name,
                                 lv_comment,
                                 p_name || ' ' || p_namespace || ' ' ||
@@ -164,7 +163,7 @@ CREATE OR REPLACE PACKAGE BODY dbadmin.registry IS
     WHEN dup_val_on_index THEN
       RETURN FALSE;
     WHEN OTHERS THEN
-      dbadmin.audit_pkg.log_error(lc_svn_id,
+      audit_pkg.log_error(lc_svn_id,
                                 lv_proc_name,
                                 lv_comment,
                                 p_name || ' ' || p_value || ' ' ||
@@ -194,7 +193,7 @@ CREATE OR REPLACE PACKAGE BODY dbadmin.registry IS
     RETURN SQL%ROWCOUNT;
   EXCEPTION
     WHEN OTHERS THEN
-      dbadmin.audit_pkg.log_error(lc_svn_id,
+      audit_pkg.log_error(lc_svn_id,
                                 lv_proc_name,
                                 lv_comment,
                                 p_name || ' ' || p_value || ' ' ||
@@ -216,7 +215,7 @@ CREATE OR REPLACE PACKAGE BODY dbadmin.registry IS
       l_return := insert_value(p_name, p_value, p_namespace, p_envir);
     END IF;
     IF NOT l_return THEN
-      dbadmin.audit_pkg.log_error(lc_svn_id,
+      audit_pkg.log_error(lc_svn_id,
                                 lv_proc_name,
                                 'update failed',
                                 p_name || ' ' || p_value || ' ' ||
@@ -228,7 +227,7 @@ CREATE OR REPLACE PACKAGE BODY dbadmin.registry IS
     END IF;
   EXCEPTION
     WHEN OTHERS THEN
-      dbadmin.audit_pkg.log_error(lc_svn_id,
+      audit_pkg.log_error(lc_svn_id,
                                 lv_proc_name,
                                 lv_comment,
                                 p_name || ' ' || p_value || ' ' ||
@@ -255,7 +254,7 @@ CREATE OR REPLACE PACKAGE BODY dbadmin.registry IS
        AND immutable = 'N';
   EXCEPTION
     WHEN OTHERS THEN
-      dbadmin.audit_pkg.log_error(lc_svn_id,
+      audit_pkg.log_error(lc_svn_id,
                                 lv_proc_name,
                                 lv_comment,
                                 p_name || ' ' || p_namespace || ' ' ||
