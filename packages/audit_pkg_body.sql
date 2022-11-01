@@ -191,7 +191,7 @@ CREATE OR REPLACE PACKAGE BODY audit_pkg IS
     l_rev_author := TRIM(rtrim(substr(l_remaining, l_loc + 1), '$'));
     -- generate rollback DDL
     IF p_object_type IN ('TABLE', 'SEQUENCE', 'JOB', 'CONSTRAINT', 'INDEX', 'COLUMN') THEN
-      l_rollback_ddl := 'exec DBADMIN.deploy_utils.drop_object(''' || p_ticket || ''',''' ||
+      l_rollback_ddl := 'exec deploy_utils.drop_object(''' || p_ticket || ''',''' ||
                         p_object_type || ''',''' || p_object_owner || ''',''' || p_object_name ||
                         ''')';
     END IF;

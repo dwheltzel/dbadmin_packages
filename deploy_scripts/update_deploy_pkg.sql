@@ -9,10 +9,10 @@ SET pages 0
 SET trimspool ON
 COL spool_name FOR a40 new_value spool_name
 SELECT 'UpdateDeployUtils_'||NAME||'_'||to_char(SYSDATE,'YYMMDDHH24MI')||'.sql' spool_name from v$database;
-SPOOL &spool_name
+SPOOL /home/oracle/logs/&spool_name
 
-grant select on sys.dba_scheduler_jobs to dbadmin;
-drop table DBADMIN.DDL_AUDIT_LOG;
+--grant select on sys.dba_scheduler_jobs to DBADMIN;
+drop table DDL_AUDIT_LOG;
 @tables/ddl_audit_log.sql
 
 @packages/audit_pkg_body.sql

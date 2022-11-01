@@ -8,7 +8,7 @@ END;
 /
 
 BEGIN
-  deploy_utils.deploy_new_table(p_ticket => 'CRQ-99999', p_table_owner => 'DBADMIN', p_table_name => 'REGISTRYTABLE', p_sql => 'create table DBADMIN.REGISTRYTABLE
+  deploy_utils.deploy_new_table(p_ticket => 'CRQ-99999', p_table_owner => USER, p_table_name => 'REGISTRYTABLE', p_sql => 'create table REGISTRYTABLE
 ( NAMESPACE VARCHAR2(30) not null,
   ENVIR VARCHAR2(30) not null,
   NAME VARCHAR2(30) not null,
@@ -19,7 +19,7 @@ BEGIN
   UPDATE_TS TIMESTAMP(6) default sysdate,
   UPDATE_USER VARCHAR2(30) default USER,
   CONSTRAINT PK_REGISTRYTABLE PRIMARY KEY (NAMESPACE,ENVIR,NAME)
-) ORGANIZATION INDEX', p_comment => 'Generic Key/value pairs');
+)', p_comment => 'Generic Key/value pairs');
 END;
 /
 
