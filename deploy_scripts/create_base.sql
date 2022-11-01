@@ -1,7 +1,6 @@
--- File $Id: create_base.sql 4160 2014-04-22 19:28:05Z dheltzel $
--- Modified $Author: dheltzel $ 
--- Date $Date: 2014-04-22 15:28:05 -0400 (Tue, 22 Apr 2014) $
--- Revision $Revision: 4160 $
+-- create_base.sql
+-- Author: dheltzel
+-- Create Date 2014-04-22
 
 SET serverout ON SIZE UNLIMITED
 SET feed OFF
@@ -12,8 +11,6 @@ COL spool_name FOR a40 new_value spool_name
 SELECT 'InstallDeployUtils_'||db_unique_name||'_'||to_char(SYSDATE,'YYMMDDHH24MI')||'.sql' spool_name from v$database;
 SPOOL &spool_name
 
--- Make grants to the dbadmin schema 
-GRANT RESOURCE TO dbadmin;
 ALTER USER dbadmin DEFAULT ROLE ALL;
 GRANT SELECT ON sys.dba_editions TO dbadmin;
 GRANT SELECT ON sys.dba_tab_privs TO dbadmin;
@@ -47,7 +44,7 @@ GRANT EXECUTE ON sys.dbms_lock TO dbadmin;
 @packages/deploy_utils_body.sql
 
 -- Verify the deploy is correct
-BEGIN dbadmin.deploy_utils.pkg_info; END;
+BEGIN deploy_utils.pkg_info; END;
 /
 SPOOL OFF
 EXIT

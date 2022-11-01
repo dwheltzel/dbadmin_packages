@@ -1,7 +1,6 @@
--- File $Id: drop_base.sql 2092 2014-01-08 16:43:32Z dheltzel $
--- Modified $Author: dheltzel $ 
--- Date $Date: 2014-01-08 11:43:32 -0500 (Wed, 08 Jan 2014) $
--- Revision $Revision: 2092 $
+-- drop_base.sql
+-- Author: dheltzel
+-- Create Date 2014-01-08
 
 drop package DBADMIN.AUDIT_PKG;
 drop package DBADMIN.DEPLOY_UTILS;
