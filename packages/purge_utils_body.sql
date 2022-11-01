@@ -1,13 +1,12 @@
 SET DEFINE OFF
 
-CREATE OR REPLACE PACKAGE BODY dbadmin.purge_utils
--- File $Id: purge_utils_body.sql 1419 2013-11-20 20:49:39Z dheltzel $
--- Modified $Author: dheltzel $
--- Date $Date: 2013-11-20 15:49:39 -0500 (Wed, 20 Nov 2013) $
--- Revision $Revision: 1419 $
+CREATE OR REPLACE PACKAGE BODY purge_utils
+-- File purge_utils_body.sql
+-- Author: dheltzel
+-- Create Date 2013-11-20
  AS
 
-  lc_svn_id VARCHAR2(200) := '$Id: purge_utils_body.sql 1419 2013-11-20 20:49:39Z dheltzel $';
+  lc_svn_id VARCHAR2(200) := 'purge_utils_body.sql dheltzel';
 
   lv_proc_name err_log.proc_name%TYPE;
 
@@ -77,7 +76,7 @@ CREATE OR REPLACE PACKAGE BODY dbadmin.purge_utils
     END LOOP;
   EXCEPTION
     WHEN OTHERS THEN
-      dbadmin.audit_pkg.log_error(lc_svn_id,
+      audit_pkg.log_error(lc_svn_id,
                                   lv_proc_name,
                                   lv_comment,
                                   'WEBAPI.API_REQUEST_LOG_',
@@ -258,7 +257,7 @@ CREATE OR REPLACE PACKAGE BODY dbadmin.purge_utils
     dbms_output.put_line('Total checkpoints: ' || l_chkpnt_count);*/
   EXCEPTION
     WHEN OTHERS THEN
-      dbadmin.audit_pkg.log_error(lc_svn_id,
+      audit_pkg.log_error(lc_svn_id,
                                   lv_proc_name,
                                   lv_comment,
                                   p_owner || '.' || p_table_name,
@@ -295,7 +294,7 @@ CREATE OR REPLACE PACKAGE BODY dbadmin.purge_utils
     END IF;
   EXCEPTION
     WHEN OTHERS THEN
-      dbadmin.audit_pkg.log_error(lc_svn_id,
+      audit_pkg.log_error(lc_svn_id,
                                   lv_proc_name,
                                   lv_comment,
                                   p_owner || '.' || p_table_name,
@@ -333,7 +332,7 @@ CREATE OR REPLACE PACKAGE BODY dbadmin.purge_utils
     END IF;
   EXCEPTION
     WHEN OTHERS THEN
-      dbadmin.audit_pkg.log_error(lc_svn_id,
+      audit_pkg.log_error(lc_svn_id,
                                   lv_proc_name,
                                   lv_comment,
                                   '',
@@ -352,7 +351,7 @@ CREATE OR REPLACE PACKAGE BODY dbadmin.purge_utils
     purge_par_exec_tasks;
   EXCEPTION
     WHEN OTHERS THEN
-      dbadmin.audit_pkg.log_error(lc_svn_id,
+      audit_pkg.log_error(lc_svn_id,
                                   lv_proc_name,
                                   lv_comment,
                                   '',
@@ -368,7 +367,7 @@ CREATE OR REPLACE PACKAGE BODY dbadmin.purge_utils
     purge_par_exec_tasks;
   EXCEPTION
     WHEN OTHERS THEN
-      dbadmin.audit_pkg.log_error(lc_svn_id,
+      audit_pkg.log_error(lc_svn_id,
                                   lv_proc_name,
                                   lv_comment,
                                   '',
@@ -384,7 +383,7 @@ CREATE OR REPLACE PACKAGE BODY dbadmin.purge_utils
     purge_par_exec_tasks;
   EXCEPTION
     WHEN OTHERS THEN
-      dbadmin.audit_pkg.log_error(lc_svn_id,
+      audit_pkg.log_error(lc_svn_id,
                                   lv_proc_name,
                                   lv_comment,
                                   '',

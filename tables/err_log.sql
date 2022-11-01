@@ -1,9 +1,8 @@
--- File $Id: err_log.sql 2091 2014-01-08 16:38:37Z dheltzel $
--- Modified $Author: dheltzel $ 
--- Date $Date: 2014-01-08 11:38:37 -0500 (Wed, 08 Jan 2014) $
--- Revision $Revision: 2091 $
+-- File err_log.sql
+-- Author: dheltzel
+-- Create Date: 2014-01-08
 
-create table DBADMIN.ERR_LOG
+create table ERR_LOG
 (
   TIMESTAMP    TIMESTAMP(6),
   USER_NAME    VARCHAR2(30),
@@ -22,14 +21,14 @@ create table DBADMIN.ERR_LOG
   SQLERRM      VARCHAR2(4000)
 );
 
-comment on table DBADMIN.ERR_LOG is 'Repository of database application errors';
-comment on column DBADMIN.ERR_LOG.TIMESTAMP is 'Time that error occured';
-comment on column DBADMIN.ERR_LOG.USER_NAME is 'Login name of the session - sys_context(''USERENV'', ''SESSION_USER'')';
-comment on column DBADMIN.ERR_LOG.ERROR_TYPE is 'Type of error - default to PL/SQL code error';
-comment on column DBADMIN.ERR_LOG.PROC_NAME is 'Name of the procedure being invoked';
-comment on column DBADMIN.ERR_LOG.ERROR_LOC is 'Comment set in code to help locate code section with error';
-comment on column DBADMIN.ERR_LOG.ERROR_DATA is 'Data values optionally sent to help debug error';
-comment on column DBADMIN.ERR_LOG.SQLCODE is 'Value of SQLCODE';
-comment on column DBADMIN.ERR_LOG.SQLERRM is 'Value of SQLERRM';
+comment on table ERR_LOG is 'Repository of database application errors';
+comment on column ERR_LOG.TIMESTAMP is 'Time that error occured';
+comment on column ERR_LOG.USER_NAME is 'Login name of the session - sys_context(''USERENV'', ''SESSION_USER'')';
+comment on column ERR_LOG.ERROR_TYPE is 'Type of error - default to PL/SQL code error';
+comment on column ERR_LOG.PROC_NAME is 'Name of the procedure being invoked';
+comment on column ERR_LOG.ERROR_LOC is 'Comment set in code to help locate code section with error';
+comment on column ERR_LOG.ERROR_DATA is 'Data values optionally sent to help debug error';
+comment on column ERR_LOG.SQLCODE is 'Value of SQLCODE';
+comment on column ERR_LOG.SQLERRM is 'Value of SQLERRM';
 
-create index DBADMIN.ERR_LOG_TS on DBADMIN.ERR_LOG (TIMESTAMP);
+create index ERR_LOG_TS on ERR_LOG (TIMESTAMP);

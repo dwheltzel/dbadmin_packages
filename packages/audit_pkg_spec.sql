@@ -1,11 +1,10 @@
 SET DEFINE OFF
 
-CREATE OR REPLACE PACKAGE dbadmin.audit_pkg IS
+CREATE OR REPLACE PACKAGE audit_pkg IS
 
-  -- File $Id: audit_pkg_spec.sql 2088 2014-01-08 16:21:15Z dheltzel $
-  -- Modified $Author: dheltzel $
-  -- Date $Date: 2014-01-08 11:21:15 -0500 (Wed, 08 Jan 2014) $
-  -- Revision $Revision: 2088 $
+  -- File audit_pkg_spec.sql
+  -- Author: dheltzel
+  -- Create Date 2014-01-08
   PROCEDURE test_harness_log_error;
 
   PROCEDURE log_detailed_error(p_source_file err_log.source_file%TYPE,

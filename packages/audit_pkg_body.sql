@@ -1,11 +1,10 @@
 SET DEFINE OFF
 
-CREATE OR REPLACE PACKAGE BODY dbadmin.audit_pkg IS
-  -- File $Id: audit_pkg_body.sql 3504 2014-03-26 15:59:29Z dheltzel $
-  -- Modified $Author: dheltzel $
-  -- Date $Date: 2014-03-26 11:59:29 -0400 (Wed, 26 Mar 2014) $
-  -- Revision $Revision: 3504 $
-  lc_svn_id VARCHAR2(200) := '$Id: audit_pkg_body.sql 3504 2014-03-26 15:59:29Z dheltzel $';
+CREATE OR REPLACE PACKAGE BODY audit_pkg IS
+  -- File audit_pkg_body.sql
+  -- Author: dheltzel
+  -- Create Date 2014-03-26
+  lc_svn_id VARCHAR2(200) := 'audit_pkg_body.sql dheltzel';
 
   lv_proc_name err_log.proc_name%TYPE;
 

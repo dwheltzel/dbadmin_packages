@@ -1,10 +1,9 @@
 SET DEFINE OFF
 
-CREATE OR REPLACE PACKAGE dbadmin.deploy_utils
--- File $Id: deploy_utils_spec.sql 4120 2014-04-21 15:11:42Z dheltzel $
--- Modified $Author: dheltzel $
--- Date $Date: 2014-04-21 11:11:42 -0400 (Mon, 21 Apr 2014) $
--- Revision $Revision: 4120 $
+CREATE OR REPLACE PACKAGE deploy_utils
+-- File deploy_utils_spec.sql
+-- Author: dheltzel
+-- Create Date 2014-04-21
 AUTHID CURRENT_USER AS
 
   /* Utility programs for deployments
@@ -148,7 +147,7 @@ AUTHID CURRENT_USER AS
 
   PROCEDURE backup_table_name(p_ticket VARCHAR, p_table_owner VARCHAR, p_table_name VARCHAR);
 
-  /* dbadmin.deploy_utils.backup_data
+  /* deploy_utils.backup_data
   This creates a backup copy of a table (or a subset of the table's rows)
   The resulting backup table name contains the ticket info and the originating schema (if needed)
   p_sql - optional select statement to only save some of the rows, default is "select *" from the table
@@ -158,7 +157,7 @@ AUTHID CURRENT_USER AS
   p_comment - optional comment to describe how to use the data, or why it was saved
   
   Features:
-  1. Details of this backup operation will be stored in the dbadmin.data_audit_log table.
+  1. Details of this backup operation will be stored in the data_audit_log table.
   2. If p_table_owner is MASTER_SCHEMA, also perform a backup of all the cust schemas with this one call
   3. Create a function that accepts the same first 3 parameters and returns the name of the backup table
   4. Add expire date as comment on backup table

@@ -1,9 +1,8 @@
--- File $Id: data_audit_log.sql 2002 2014-01-03 20:55:45Z dheltzel $
--- Modified $Author: dheltzel $ 
--- Date $Date: 2014-01-03 15:55:45 -0500 (Fri, 03 Jan 2014) $
--- Revision $Revision: 2002 $
+-- File data_audit_log.sql
+-- Author: dheltzel
+-- Create Date: 2014-01-03
 
-create table DBADMIN.DATA_AUDIT_LOG
+create table DATA_AUDIT_LOG
 (
   LOG_TIMESTAMP  TIMESTAMP(6),
   USER_NAME      VARCHAR2(30),
@@ -17,8 +16,8 @@ create table DBADMIN.DATA_AUDIT_LOG
   LOG_COMMENT    VARCHAR2(2000)
 );
 
-comment on table DBADMIN.DATA_AUDIT_LOG is 'Auditable DML by any application';
-comment on column DBADMIN.DATA_AUDIT_LOG.LOG_TIMESTAMP is 'Time that DML occured';
-comment on column DBADMIN.DATA_AUDIT_LOG.USER_NAME is 'Login name of the session - sys_context(''USERENV'', ''SESSION_USER'')';
+comment on table DATA_AUDIT_LOG is 'Auditable DML by any application';
+comment on column DATA_AUDIT_LOG.LOG_TIMESTAMP is 'Time that DML occured';
+comment on column DATA_AUDIT_LOG.USER_NAME is 'Login name of the session - sys_context(''USERENV'', ''SESSION_USER'')';
 
-create index DBADMIN.DATA_AUDIT_LOG_TS on DBADMIN.DATA_AUDIT_LOG (LOG_TIMESTAMP);
+create index DATA_AUDIT_LOG_TS on DATA_AUDIT_LOG (LOG_TIMESTAMP);

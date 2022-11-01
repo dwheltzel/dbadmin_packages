@@ -1,9 +1,8 @@
--- File $Id: pkg_run_log.sql 2002 2014-01-03 20:55:45Z dheltzel $
--- Modified $Author: dheltzel $ 
--- Date $Date: 2014-01-03 15:55:45 -0500 (Fri, 03 Jan 2014) $
--- Revision $Revision: 2002 $
+-- File pkg_run_log.sql
+-- Author: dheltzel
+-- Create Date: 2014-01-03
 
-create table DBADMIN.PKG_RUN_LOG
+create table PKG_RUN_LOG
 (
   PACKAGE          VARCHAR2(30),
   REVISION         VARCHAR2(30),
@@ -17,5 +16,5 @@ create table DBADMIN.PKG_RUN_LOG
   LAST_LOAD_USER   VARCHAR2(30)
 );
 
-comment on table DBADMIN.PKG_RUN_LOG is 'Log of itmes that a particular package version was running';
+comment on table PKG_RUN_LOG is 'Log of times that a particular package version was running';
 

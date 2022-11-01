@@ -1,12 +1,11 @@
 SET DEFINE OFF
 
-CREATE OR REPLACE PACKAGE BODY dbadmin.deploy_utils
--- File $Id: deploy_utils_body.sql 4120 2014-04-21 15:11:42Z dheltzel $
--- Modified $Author: dheltzel $
--- Date $Date: 2014-04-21 11:11:42 -0400 (Mon, 21 Apr 2014) $
--- Revision $Revision: 4120 $
+CREATE OR REPLACE PACKAGE BODY deploy_utils
+-- File deploy_utils_body.sql
+-- Author: dheltzel
+-- Create Date 2014-04-21
  AS
-  lc_svn_id    VARCHAR2(200) := '$Id: deploy_utils_body.sql 4120 2014-04-21 15:11:42Z dheltzel $';
+  lc_svn_id    VARCHAR2(200) := 'deploy_utils_body.sql dheltzel';
   lv_proc_name err_log.proc_name%TYPE;
   lv_comment   err_log.error_loc%TYPE := 'Starting';
 
@@ -24,16 +23,16 @@ CREATE OR REPLACE PACKAGE BODY dbadmin.deploy_utils
     lv_proc_name := 'pkg_info';
     lv_comment   := 'Dumping deploy pkg info';
     dbms_output.put_line('$Revision: 4120 $');
-    dbms_output.put_line('$Date: 2014-04-21 11:11:42 -0400 (Mon, 21 Apr 2014) $');
+    dbms_output.put_line('Date: 2014-04-21 11:11:42 -0400 (Mon, 21 Apr 2014) $');
     dbms_output.put_line('$Author: dheltzel $');
-    dbms_output.put_line('$Id: deploy_utils_body.sql 4120 2014-04-21 15:11:42Z dheltzel $');
+    dbms_output.put_line('deploy_utils_body.sql 4120 2014-04-21 15:11:42Z dheltzel $');
     lv_comment := 'Getting the current edition';
     SELECT sys_context('USERENV', 'CURRENT_EDITION_NAME') INTO v_edition FROM dual;
     dbms_output.put_line('Edition: ' || v_edition);
-    dbadmin.audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, v_edition, $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
+    audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, v_edition, $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
   EXCEPTION
     WHEN OTHERS THEN
-      dbadmin.audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, v_edition, $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
+      audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, v_edition, $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
       IF lv_debug_lvl > 0 THEN
         RAISE;
       END IF;
@@ -57,10 +56,10 @@ CREATE OR REPLACE PACKAGE BODY dbadmin.deploy_utils
     lv_proc_name     := 'initialize_deploy';
     current_release  := p_release_name;
     current_revision := p_svn_revision;
-    dbadmin.audit_pkg.log_ddl_change(p_release_name, p_svn_revision, 'DEPLOY', NULL, p_ticket, NULL, NULL, p_svn_id);
+    audit_pkg.log_ddl_change(p_release_name, p_svn_revision, 'DEPLOY', NULL, p_ticket, NULL, NULL, p_svn_id);
   EXCEPTION
     WHEN OTHERS THEN
-      dbadmin.audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, '', $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
+      audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, '', $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
       IF lv_debug_lvl > 0 THEN
         RAISE;
       END IF;
@@ -72,7 +71,7 @@ CREATE OR REPLACE PACKAGE BODY dbadmin.deploy_utils
     RETURN(current_release);
   EXCEPTION
     WHEN OTHERS THEN
-      dbadmin.audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, '', $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
+      audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, '', $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
       IF lv_debug_lvl > 0 THEN
         RAISE;
       END IF;
@@ -84,7 +83,7 @@ CREATE OR REPLACE PACKAGE BODY dbadmin.deploy_utils
     RETURN(current_revision);
   EXCEPTION
     WHEN OTHERS THEN
-      dbadmin.audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, '', $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
+      audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, '', $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
       IF lv_debug_lvl > 0 THEN
         RAISE;
       END IF;
@@ -102,7 +101,7 @@ CREATE OR REPLACE PACKAGE BODY dbadmin.deploy_utils
     END IF;
   EXCEPTION
     WHEN OTHERS THEN
-      dbadmin.audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, '', $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
+      audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, '', $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
       IF lv_debug_lvl > 0 THEN
         RAISE;
       END IF;
@@ -115,7 +114,7 @@ CREATE OR REPLACE PACKAGE BODY dbadmin.deploy_utils
     audit_pkg.log_pkg_init(p_name, p_svn_id);
   EXCEPTION
     WHEN OTHERS THEN
-      dbadmin.audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, '', $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
+      audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, '', $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
       IF lv_debug_lvl > 0 THEN
         RAISE;
       END IF;
@@ -138,7 +137,7 @@ CREATE OR REPLACE PACKAGE BODY dbadmin.deploy_utils
     END IF;
   EXCEPTION
     WHEN OTHERS THEN
-      dbadmin.audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, '', $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
+      audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, '', $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
       IF lv_debug_lvl > 0 THEN
         RAISE;
       END IF;
@@ -160,7 +159,7 @@ CREATE OR REPLACE PACKAGE BODY dbadmin.deploy_utils
     END IF;
   EXCEPTION
     WHEN OTHERS THEN
-      dbadmin.audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, '', $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
+      audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, '', $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
       IF lv_debug_lvl > 0 THEN
         RAISE;
       END IF;
@@ -172,7 +171,7 @@ CREATE OR REPLACE PACKAGE BODY dbadmin.deploy_utils
       RETURN TRUE;
     EXCEPTION
       WHEN OTHERS THEN
-        dbadmin.audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, '', $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
+        audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, '', $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
         RETURN TRUE;
     END is_cust_facing_db;
   
@@ -188,7 +187,7 @@ CREATE OR REPLACE PACKAGE BODY dbadmin.deploy_utils
       RETURN v_sessions;
     EXCEPTION
       WHEN OTHERS THEN
-        dbadmin.audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, '', $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
+        audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, '', $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
         RETURN 1;
     END conflicting_sessions;
   
@@ -208,7 +207,7 @@ CREATE OR REPLACE PACKAGE BODY dbadmin.deploy_utils
       END IF;
     EXCEPTION
       WHEN OTHERS THEN
-        dbadmin.audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, '', $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
+        audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, '', $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
         RETURN TRUE;
     END using_default_edition;
   
@@ -222,7 +221,7 @@ CREATE OR REPLACE PACKAGE BODY dbadmin.deploy_utils
       END IF;
     EXCEPTION
       WHEN OTHERS THEN
-        dbadmin.audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, '', $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
+        audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, '', $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
         RETURN FALSE;
     END deploy_enabled;
   
@@ -255,12 +254,12 @@ CREATE OR REPLACE PACKAGE BODY dbadmin.deploy_utils
                             crec.name;
         EXCEPTION
           WHEN OTHERS THEN
-            dbadmin.audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, '', $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
+            audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, '', $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
         END;
       END LOOP;
     EXCEPTION
       WHEN OTHERS THEN
-        dbadmin.audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, '', $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
+        audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, '', $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
     END fix_synonyms_for_user;
   
     -- Creates any missing synonyms for the user specified.
@@ -287,7 +286,7 @@ CREATE OR REPLACE PACKAGE BODY dbadmin.deploy_utils
       END LOOP;
     EXCEPTION
       WHEN OTHERS THEN
-        dbadmin.audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, p_username, $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
+        audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, p_username, $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
     END fix_synonyms_for_user;
   
     -- Creates any missing synonyms for all users.
@@ -304,7 +303,7 @@ CREATE OR REPLACE PACKAGE BODY dbadmin.deploy_utils
       END LOOP;
     EXCEPTION
       WHEN OTHERS THEN
-        dbadmin.audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, '', $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
+        audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, '', $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
     END fix_synonyms_for_all_users;
   
     PROCEDURE create_synonyms(p_obj_owner VARCHAR, p_obj_name VARCHAR) IS
@@ -328,7 +327,7 @@ CREATE OR REPLACE PACKAGE BODY dbadmin.deploy_utils
       END LOOP;
     EXCEPTION
       WHEN OTHERS THEN
-        dbadmin.audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, p_obj_owner || '.' ||
+        audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, p_obj_owner || '.' ||
                                      p_obj_name, $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
     END create_synonyms;
   
@@ -351,7 +350,7 @@ CREATE OR REPLACE PACKAGE BODY dbadmin.deploy_utils
       lv_comment := 'Making grants';
     EXCEPTION
       WHEN OTHERS THEN
-        dbadmin.audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, p_obj_type || ' ' ||
+        audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, p_obj_type || ' ' ||
                                      p_obj_owner || '.' ||
                                      p_obj_name, $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
     END synonyms_grants;
@@ -415,7 +414,7 @@ CREATE OR REPLACE PACKAGE BODY dbadmin.deploy_utils
     END LOOP;
   EXCEPTION
     WHEN OTHERS THEN
-      dbadmin.audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, '', $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
+      audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, '', $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
       IF lv_debug_lvl > 0 THEN
         RAISE;
       END IF;
@@ -432,19 +431,19 @@ CREATE OR REPLACE PACKAGE BODY dbadmin.deploy_utils
       EXECUTE IMMEDIATE 'CREATE USER ' || p_schema ||
                         ' IDENTIFIED BY "D(FB2346----32DF" DEFAULT TABLESPACE DATA1 QUOTA UNLIMITED ON DATA1 ENABLE EDITIONS ACCOUNT LOCK';
       lv_comment := 'Logging change';
-      dbadmin.audit_pkg.log_ddl_change(NULL, p_schema, 'SCHEMA', NULL, p_ticket, NULL, p_comment, lc_svn_id);
+      audit_pkg.log_ddl_change(NULL, p_schema, 'SCHEMA', NULL, p_ticket, NULL, p_comment, lc_svn_id);
       BEGIN
         EXECUTE IMMEDIATE 'GRANT RESOURCE TO ' || p_schema;
       EXCEPTION
         WHEN OTHERS THEN
-          dbadmin.audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, p_ticket || ' ' ||
+          audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, p_ticket || ' ' ||
                                        p_schema, $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
       END;
       BEGIN
         EXECUTE IMMEDIATE 'REVOKE CONNECT FROM ' || p_schema;
       EXCEPTION
         WHEN OTHERS THEN
-          dbadmin.audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, p_ticket, $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
+          audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, p_ticket, $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
       END;
       IF lv_debug_lvl > 5 THEN
         dbms_output.put_line('INFO: Schema ' || p_schema || ' created for ' || p_ticket);
@@ -452,7 +451,7 @@ CREATE OR REPLACE PACKAGE BODY dbadmin.deploy_utils
     END IF;
   EXCEPTION
     WHEN OTHERS THEN
-      dbadmin.audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, p_ticket, $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
+      audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, p_ticket, $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
       IF lv_debug_lvl > 0 THEN
         RAISE;
       END IF;
@@ -478,11 +477,11 @@ CREATE OR REPLACE PACKAGE BODY dbadmin.deploy_utils
          AND is_partitioned_db THEN
         EXECUTE IMMEDIATE p_partitioned_sql;
         lv_comment := 'Logging create partitioned table';
-        dbadmin.audit_pkg.log_ddl_change(p_table_owner, p_table_name, 'TABLE', p_table_owner, p_ticket, p_partitioned_sql, p_comment, lc_svn_id);
+        audit_pkg.log_ddl_change(p_table_owner, p_table_name, 'TABLE', p_table_owner, p_ticket, p_partitioned_sql, p_comment, lc_svn_id);
       ELSE
         EXECUTE IMMEDIATE p_sql;
         lv_comment := 'Logging create table';
-        dbadmin.audit_pkg.log_ddl_change(p_table_owner, p_table_name, 'TABLE', p_table_owner, p_ticket, p_sql, p_comment, lc_svn_id);
+        audit_pkg.log_ddl_change(p_table_owner, p_table_name, 'TABLE', p_table_owner, p_ticket, p_sql, p_comment, lc_svn_id);
       END IF;
       IF (p_comment IS NOT NULL) THEN
         lv_comment := 'Adding comment:' || p_comment;
@@ -496,7 +495,7 @@ CREATE OR REPLACE PACKAGE BODY dbadmin.deploy_utils
     END IF;
   EXCEPTION
     WHEN OTHERS THEN
-      dbadmin.audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, p_ticket || ' ' ||
+      audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, p_ticket || ' ' ||
                                    p_table_owner || ' ' ||
                                    p_table_name, $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
       IF lv_debug_lvl > 0 THEN
@@ -523,7 +522,7 @@ CREATE OR REPLACE PACKAGE BODY dbadmin.deploy_utils
       lv_comment := 'Creating';
       EXECUTE IMMEDIATE p_sql;
       lv_comment := 'Logging change';
-      dbadmin.audit_pkg.log_ddl_change(p_table_owner, p_col_name, 'COLUMN', p_table_name, p_ticket, p_sql, p_comment, lc_svn_id);
+      audit_pkg.log_ddl_change(p_table_owner, p_col_name, 'COLUMN', p_table_name, p_ticket, p_sql, p_comment, lc_svn_id);
       IF (p_comment IS NOT NULL) THEN
         lv_comment := 'Adding comment';
         EXECUTE IMMEDIATE 'comment on column ' || p_table_owner || '.' || p_table_name || '.' ||
@@ -536,7 +535,7 @@ CREATE OR REPLACE PACKAGE BODY dbadmin.deploy_utils
     END IF;
   EXCEPTION
     WHEN OTHERS THEN
-      dbadmin.audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, p_ticket || ' ' ||
+      audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, p_ticket || ' ' ||
                                    p_table_owner || ' ' ||
                                    p_table_name || ' ' ||
                                    p_col_name, $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
@@ -567,11 +566,11 @@ CREATE OR REPLACE PACKAGE BODY dbadmin.deploy_utils
          AND is_partitioned_db THEN
         EXECUTE IMMEDIATE p_partitioned_sql;
         lv_comment := 'Logging create partitioned index';
-        dbadmin.audit_pkg.log_ddl_change(p_table_owner, p_index_name, 'INDEX', p_table_name, p_ticket, p_partitioned_sql, p_comment, lc_svn_id);
+        audit_pkg.log_ddl_change(p_table_owner, p_index_name, 'INDEX', p_table_name, p_ticket, p_partitioned_sql, p_comment, lc_svn_id);
       ELSE
         EXECUTE IMMEDIATE p_sql;
         lv_comment := 'Logging create index';
-        dbadmin.audit_pkg.log_ddl_change(p_table_owner, p_index_name, 'INDEX', p_table_name, p_ticket, p_sql, p_comment, lc_svn_id);
+        audit_pkg.log_ddl_change(p_table_owner, p_index_name, 'INDEX', p_table_name, p_ticket, p_sql, p_comment, lc_svn_id);
       END IF;
       IF lv_debug_lvl > 5 THEN
         dbms_output.put_line('INFO: Index ' || p_index_name || ' added to table ' || p_table_owner || '.' ||
@@ -580,7 +579,7 @@ CREATE OR REPLACE PACKAGE BODY dbadmin.deploy_utils
     END IF;
   EXCEPTION
     WHEN OTHERS THEN
-      dbadmin.audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, p_ticket || ' ' ||
+      audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, p_ticket || ' ' ||
                                    p_table_owner || ' ' ||
                                    p_table_name || ' ' ||
                                    p_index_name, $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
@@ -611,7 +610,7 @@ CREATE OR REPLACE PACKAGE BODY dbadmin.deploy_utils
       END IF;
       EXECUTE IMMEDIATE v_sql;
       lv_comment := 'Logging change';
-      dbadmin.audit_pkg.log_ddl_change(p_owner, p_seq_name, 'SEQUENCE', NULL, p_ticket, v_sql, p_comment, lc_svn_id);
+      audit_pkg.log_ddl_change(p_owner, p_seq_name, 'SEQUENCE', NULL, p_ticket, v_sql, p_comment, lc_svn_id);
       IF lv_debug_lvl > 5 THEN
         dbms_output.put_line('INFO: Sequence ' || p_owner || '.' || p_seq_name || ' created for ' ||
                              p_ticket);
@@ -619,7 +618,7 @@ CREATE OR REPLACE PACKAGE BODY dbadmin.deploy_utils
     END IF;
   EXCEPTION
     WHEN OTHERS THEN
-      dbadmin.audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, p_ticket || ' ' || p_owner || ' ' ||
+      audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, p_ticket || ' ' || p_owner || ' ' ||
                                    p_seq_name, $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
       IF lv_debug_lvl > 0 THEN
         RAISE;
@@ -650,7 +649,7 @@ CREATE OR REPLACE PACKAGE BODY dbadmin.deploy_utils
     END IF;
   EXCEPTION
     WHEN OTHERS THEN
-      dbadmin.audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, p_ticket || ' ' ||
+      audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, p_ticket || ' ' ||
                                    cust_seq_schema || ' ' ||
                                    p_seq_name, $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
       IF lv_debug_lvl > 0 THEN
@@ -677,7 +676,7 @@ CREATE OR REPLACE PACKAGE BODY dbadmin.deploy_utils
       lv_comment := 'Creating';
       EXECUTE IMMEDIATE p_sql;
       lv_comment := 'Logging change';
-      dbadmin.audit_pkg.log_ddl_change(p_table_owner, p_constraint_name, 'CONSTRAINT', p_table_name, p_ticket, p_sql, p_comment, lc_svn_id);
+      audit_pkg.log_ddl_change(p_table_owner, p_constraint_name, 'CONSTRAINT', p_table_name, p_ticket, p_sql, p_comment, lc_svn_id);
       IF lv_debug_lvl > 5 THEN
         dbms_output.put_line('INFO: Constraint ' || p_constraint_name || ' added to table ' ||
                              p_table_owner || '.' || p_table_name || ' for ' || p_ticket);
@@ -685,7 +684,7 @@ CREATE OR REPLACE PACKAGE BODY dbadmin.deploy_utils
     END IF;
   EXCEPTION
     WHEN OTHERS THEN
-      dbadmin.audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, p_ticket || ' ' ||
+      audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, p_ticket || ' ' ||
                                    p_table_owner || ' ' ||
                                    p_table_name || ' ' ||
                                    p_constraint_name, $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
@@ -711,7 +710,7 @@ CREATE OR REPLACE PACKAGE BODY dbadmin.deploy_utils
       lv_comment := 'Creating job';
       EXECUTE IMMEDIATE p_sql;
       lv_comment := 'Logging change';
-      dbadmin.audit_pkg.log_ddl_change(p_owner, p_job_name, 'JOB', NULL, p_ticket, p_sql, p_comment, lc_svn_id);
+      audit_pkg.log_ddl_change(p_owner, p_job_name, 'JOB', NULL, p_ticket, p_sql, p_comment, lc_svn_id);
       IF lv_debug_lvl > 5 THEN
         dbms_output.put_line('INFO: Oracle Job ' || p_owner || '.' || p_job_name ||
                              ' created for ' || p_ticket);
@@ -719,7 +718,7 @@ CREATE OR REPLACE PACKAGE BODY dbadmin.deploy_utils
     END IF;
   EXCEPTION
     WHEN OTHERS THEN
-      dbadmin.audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, p_ticket || ' ' || p_owner || ' ' ||
+      audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, p_ticket || ' ' || p_owner || ' ' ||
                                    p_job_name, $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
       IF lv_debug_lvl > 0 THEN
         RAISE;
@@ -745,7 +744,7 @@ CREATE OR REPLACE PACKAGE BODY dbadmin.deploy_utils
       lv_comment := 'Altering';
       EXECUTE IMMEDIATE p_sql;
       lv_comment := 'Logging change';
-      dbadmin.audit_pkg.log_ddl_change(p_table_owner, p_col_name, 'COLUMN', p_table_name, p_ticket, p_sql, p_comment, lc_svn_id);
+      audit_pkg.log_ddl_change(p_table_owner, p_col_name, 'COLUMN', p_table_name, p_ticket, p_sql, p_comment, lc_svn_id);
       IF (p_comment IS NOT NULL) THEN
         lv_comment := 'Adding comment';
         EXECUTE IMMEDIATE 'comment on column ' || p_table_owner || '.' || p_table_name || '.' ||
@@ -758,7 +757,7 @@ CREATE OR REPLACE PACKAGE BODY dbadmin.deploy_utils
     END IF;
   EXCEPTION
     WHEN OTHERS THEN
-      dbadmin.audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, p_ticket || ' ' ||
+      audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, p_ticket || ' ' ||
                                    p_table_owner || ' ' ||
                                    p_table_name || ' ' ||
                                    p_col_name, $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
@@ -771,13 +770,13 @@ CREATE OR REPLACE PACKAGE BODY dbadmin.deploy_utils
   BEGIN
     lv_proc_name := 'deploy_ddl';
     EXECUTE IMMEDIATE p_sql;
-    dbadmin.audit_pkg.log_ddl_change(NULL, NULL, NULL, NULL, p_ticket, p_sql, p_comment, lc_svn_id);
+    audit_pkg.log_ddl_change(NULL, NULL, NULL, NULL, p_ticket, p_sql, p_comment, lc_svn_id);
     IF lv_debug_lvl > 5 THEN
       dbms_output.put_line('INFO: Generic DDL ' || p_sql || ' performed for ' || p_ticket);
     END IF;
   EXCEPTION
     WHEN OTHERS THEN
-      dbadmin.audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, p_ticket, $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
+      audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, p_ticket, $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
       IF lv_debug_lvl > 0 THEN
         RAISE;
       END IF;
@@ -804,7 +803,7 @@ CREATE OR REPLACE PACKAGE BODY dbadmin.deploy_utils
           lv_comment := 'Dropping ' || p_name || ' job';
           sys.dbms_scheduler.drop_job(p_owner || '.' || p_name);
           lv_comment := 'Logging change';
-          dbadmin.audit_pkg.log_ddl_change(p_owner, p_name, p_type, NULL, p_ticket, NULL, 'Dropped: ' ||
+          audit_pkg.log_ddl_change(p_owner, p_name, p_type, NULL, p_ticket, NULL, 'Dropped: ' ||
                                             p_comment, lc_svn_id);
           IF lv_debug_lvl > 5 THEN
             dbms_output.put_line('INFO: ' || p_type || ' ' || p_owner || '.' || p_name ||
@@ -826,7 +825,7 @@ CREATE OR REPLACE PACKAGE BODY dbadmin.deploy_utils
           EXECUTE IMMEDIATE 'alter table ' || p_owner || '.' || l_parent || ' drop constraint ' ||
                             p_name;
           lv_comment := 'Logging change';
-          dbadmin.audit_pkg.log_ddl_change(p_owner, p_name, p_type, NULL, p_ticket, NULL, 'Dropped: ' ||
+          audit_pkg.log_ddl_change(p_owner, p_name, p_type, NULL, p_ticket, NULL, 'Dropped: ' ||
                                             p_comment, lc_svn_id);
           IF lv_debug_lvl > 5 THEN
             dbms_output.put_line('INFO: ' || p_type || ' ' || p_owner || '.' || p_name ||
@@ -848,7 +847,7 @@ CREATE OR REPLACE PACKAGE BODY dbadmin.deploy_utils
           EXECUTE IMMEDIATE 'alter table ' || p_owner || '.' || l_parent || ' drop column ' ||
                             p_name;
           lv_comment := 'Logging change';
-          dbadmin.audit_pkg.log_ddl_change(p_owner, p_name, p_type, NULL, p_ticket, NULL, 'Dropped: ' ||
+          audit_pkg.log_ddl_change(p_owner, p_name, p_type, NULL, p_ticket, NULL, 'Dropped: ' ||
                                             p_comment, lc_svn_id);
           IF lv_debug_lvl > 5 THEN
             dbms_output.put_line('INFO: ' || p_type || ' ' || p_owner || '.' || p_name ||
@@ -869,7 +868,7 @@ CREATE OR REPLACE PACKAGE BODY dbadmin.deploy_utils
           ELSE
             EXECUTE IMMEDIATE p_sql;
             lv_comment := 'Logging change';
-            dbadmin.audit_pkg.log_ddl_change(p_owner, p_name, p_type, NULL, p_ticket, p_sql, 'Dropped: ' ||
+            audit_pkg.log_ddl_change(p_owner, p_name, p_type, NULL, p_ticket, p_sql, 'Dropped: ' ||
                                               p_comment, lc_svn_id);
           END IF;
           IF lv_debug_lvl > 5 THEN
@@ -880,7 +879,7 @@ CREATE OR REPLACE PACKAGE BODY dbadmin.deploy_utils
     END CASE;
   EXCEPTION
     WHEN OTHERS THEN
-      dbadmin.audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, p_ticket || ' ' || p_type || ' ' ||
+      audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, p_ticket || ' ' || p_type || ' ' ||
                                    p_owner || '.' || p_name, $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
       IF lv_debug_lvl > 0 THEN
         RAISE;
@@ -902,7 +901,7 @@ CREATE OR REPLACE PACKAGE BODY dbadmin.deploy_utils
     RETURN substr(v_name, 1, 30);
   EXCEPTION
     WHEN OTHERS THEN
-      dbadmin.audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, p_ticket || ' ' ||
+      audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, p_ticket || ' ' ||
                                    p_table_owner || '.' ||
                                    p_table_name, $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
       IF lv_debug_lvl > 0 THEN
@@ -920,7 +919,7 @@ CREATE OR REPLACE PACKAGE BODY dbadmin.deploy_utils
     dbms_output.put_line(backup_schema || '.' || v_name);
   EXCEPTION
     WHEN OTHERS THEN
-      dbadmin.audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, p_ticket || ' ' ||
+      audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, p_ticket || ' ' ||
                                    p_table_owner || '.' ||
                                    p_table_name, $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
       IF lv_debug_lvl > 0 THEN
@@ -928,7 +927,7 @@ CREATE OR REPLACE PACKAGE BODY dbadmin.deploy_utils
       END IF;
   END backup_table_name;
 
-  /* dbadmin.deploy_utils.backup_data
+  /* deploy_utils.backup_data
   This creates a backup copy of a table (or a subset of the table's rows)
   The resulting backup table name contains the ticket info and the originating schema (if needed)
   p_sql - optional select statement to only save some of the rows, default is "select *" from the table
@@ -938,7 +937,7 @@ CREATE OR REPLACE PACKAGE BODY dbadmin.deploy_utils
   p_comment - optional comment to describe how to use the data, or why it was saved
   
   Features:
-  1. Details of this backup operation will be stored in the dbadmin.data_audit_log table.
+  1. Details of this backup operation will be stored in the data_audit_log table.
   2. If p_table_owner is MASTER_SCHEMA, also perform a backup of all the cust schemas with this one call
   3. Create a function that accepts the same first 3 parameters and returns the name of the backup table
   4. Add expire date as comment on backup table
@@ -1019,7 +1018,7 @@ CREATE OR REPLACE PACKAGE BODY dbadmin.deploy_utils
       END IF;
     EXCEPTION
       WHEN OTHERS THEN
-        dbadmin.audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, p_ticket || ' ' ||
+        audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, p_ticket || ' ' ||
                                      p_table_owner || '.' ||
                                      p_table_name, $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
     END bkp_1_table;
@@ -1047,7 +1046,7 @@ CREATE OR REPLACE PACKAGE BODY dbadmin.deploy_utils
     END IF;
   EXCEPTION
     WHEN OTHERS THEN
-      dbadmin.audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, p_ticket || ' ' ||
+      audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, p_ticket || ' ' ||
                                    p_table_owner || '.' ||
                                    p_table_name, $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
       IF lv_debug_lvl > 0 THEN
@@ -1118,7 +1117,7 @@ CREATE OR REPLACE PACKAGE BODY dbadmin.deploy_utils
       END IF;
     EXCEPTION
       WHEN OTHERS THEN
-        dbadmin.audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, p_ticket || ' ' ||
+        audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, p_ticket || ' ' ||
                                      p_table_owner || '.' ||
                                      p_table_name, $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
     END purge_1_table;
@@ -1138,7 +1137,7 @@ CREATE OR REPLACE PACKAGE BODY dbadmin.deploy_utils
     END IF;
   EXCEPTION
     WHEN OTHERS THEN
-      dbadmin.audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, p_ticket || ' ' ||
+      audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, p_ticket || ' ' ||
                                    p_table_owner || '.' ||
                                    p_table_name, $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
       IF lv_debug_lvl > 0 THEN
