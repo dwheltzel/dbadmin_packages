@@ -88,10 +88,10 @@ CREATE OR REPLACE PACKAGE BODY trim_utils
   FUNCTION chk_settings(var_name IN VARCHAR2) RETURN VARCHAR2 IS
     RESULT VARCHAR2(100);
   BEGIN
-    RESULT := registry.get_value(var_name, 'PURGE');
+    RESULT := registry.get_value(var_name, 'TRIM');
     IF RESULT IS NOT NULL THEN
       DELETE FROM registrytable
-       WHERE namespace = 'PURGE'
+       WHERE namespace = 'TRIM'
          AND NAME = var_name
          AND immutable = 'N';
     END IF;
@@ -246,7 +246,7 @@ CREATE OR REPLACE PACKAGE BODY trim_utils
       audit_pkg.log_data_change(lv_proc_name,
                                 p_owner,
                                 p_table_name,
-                                'Purge',
+                                'Trim',
                                 'D',
                                 l_deleted_recs,
                                 '');
@@ -286,7 +286,7 @@ CREATE OR REPLACE PACKAGE BODY trim_utils
       audit_pkg.log_data_change(lv_proc_name,
                                 p_owner,
                                 p_table_name,
-                                'Purge',
+                                'Trim',
                                 'D',
                                 l_deleted_recs,
                                 '');
@@ -313,7 +313,7 @@ CREATE OR REPLACE PACKAGE BODY trim_utils
      WHERE end_ts < SYSDATE - p_days
        AND task_owner = USER;
     IF (v_cnt > 0) THEN
-      audit_pkg.log_action(lv_proc_name, 'Purge', 'Keep Days: ' || p_days);
+      audit_pkg.log_action(lv_proc_name, 'Trim', 'Keep Days: ' || p_days);
       FOR c_rec IN (SELECT DISTINCT task_name
                       FROM sys.dba_parallel_execute_chunks
                      WHERE end_ts < SYSDATE - p_days
@@ -323,7 +323,7 @@ CREATE OR REPLACE PACKAGE BODY trim_utils
       audit_pkg.log_data_change(lv_proc_name,
                                 'SYS',
                                 'DBA_PARALLEL_EXECUTE',
-                                'Purge',
+                                'Trim',
                                 'D',
                                 v_cnt,
                                 'Cleanup of Parallel Execute Tasks older than ' ||

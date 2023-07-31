@@ -168,9 +168,9 @@ AUTHID CURRENT_USER AS
                         p_expire_date DATE DEFAULT NULL,
                         p_comment     VARCHAR DEFAULT NULL);
 
-  -- purge_backup_data - purges the backup data if it is past it's expire date
+  -- trim_backup_data - trims the backup data if it is past it's expire date
   -- the force option ignores the expiration date and always drops the data
-  PROCEDURE purge_backup_data(p_ticket      VARCHAR,
+  PROCEDURE trim_backup_data(p_ticket      VARCHAR,
                               p_table_owner VARCHAR,
                               p_table_name  VARCHAR,
                               force         BOOLEAN DEFAULT FALSE);

@@ -1053,15 +1053,15 @@ CREATE OR REPLACE PACKAGE BODY deploy_utils
       END IF;
   END backup_data;
 
-  -- purge_backup_data - purges the backup data if it is past it's expire date
+  -- trim_backup_data - trims the backup data if it is past it's expire date
   -- the force option ignores the expiration date and always drops the data
-  PROCEDURE purge_backup_data(p_ticket      VARCHAR,
+  PROCEDURE trim_backup_data(p_ticket      VARCHAR,
                               p_table_owner VARCHAR,
                               p_table_name  VARCHAR,
                               force         BOOLEAN DEFAULT FALSE) IS
     v_bkp_table_name VARCHAR2(35);
   
-    PROCEDURE purge_1_table(p_ticket      VARCHAR,
+    PROCEDURE trim_1_table(p_ticket      VARCHAR,
                             p_table_owner VARCHAR,
                             p_table_name  VARCHAR,
                             force         BOOLEAN DEFAULT FALSE) IS
@@ -1070,7 +1070,7 @@ CREATE OR REPLACE PACKAGE BODY deploy_utils
       v_bkp_table_name VARCHAR2(35);
       v_expired        BOOLEAN := FALSE;
     BEGIN
-      lv_comment := 'in purge_1_table proc';
+      lv_comment := 'in trim_1_table proc';
       lv_comment := 'chk for existance of the backup table';
       SELECT COUNT(*)
         INTO v_cnt
@@ -1102,16 +1102,16 @@ CREATE OR REPLACE PACKAGE BODY deploy_utils
           VALUES
             (systimestamp,
              USER,
-             'deploy_utils.purge_backup_data',
+             'deploy_utils.trim_backup_data',
              p_table_owner,
              p_table_name,
-             'PURGE',
+             'TRIM',
              'DROP',
              '');
         END IF;
         IF lv_debug_lvl > 5 THEN
           dbms_output.put_line('INFO: Backup data from ' || p_table_owner || '.' || p_table_name ||
-                               ' purged for ' || p_ticket);
+                               ' trimd for ' || p_ticket);
         END IF;
       END IF;
     EXCEPTION
@@ -1119,9 +1119,9 @@ CREATE OR REPLACE PACKAGE BODY deploy_utils
         audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, p_ticket || ' ' ||
                                      p_table_owner || '.' ||
                                      p_table_name, $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
-    END purge_1_table;
+    END trim_1_table;
   BEGIN
-    lv_proc_name := 'purge_backup_data';
+    lv_proc_name := 'trim_backup_data';
     lv_comment   := 'Checking if this goes to all cust schemas';
     IF p_table_owner = 'MASTER_SCHEMA' THEN
       lv_comment := 'if the PL/SQL table has no records, initialize it';
@@ -1129,10 +1129,10 @@ CREATE OR REPLACE PACKAGE BODY deploy_utils
       lv_comment := 'loop over all the cust schemas';
       FOR i IN cust_schema_tab.first .. cust_schema_tab.last
       LOOP
-        purge_1_table(p_ticket, cust_schema_tab(i), p_table_name, force);
+        trim_1_table(p_ticket, cust_schema_tab(i), p_table_name, force);
       END LOOP;
     ELSE
-      purge_1_table(p_ticket, p_table_owner, p_table_name, force);
+      trim_1_table(p_ticket, p_table_owner, p_table_name, force);
     END IF;
   EXCEPTION
     WHEN OTHERS THEN
@@ -1142,7 +1142,7 @@ CREATE OR REPLACE PACKAGE BODY deploy_utils
       IF lv_debug_lvl > 0 THEN
         RAISE;
       END IF;
-  END purge_backup_data;
+  END trim_backup_data;
 
 BEGIN
   audit_pkg.log_pkg_init($$PLSQL_UNIT, lc_svn_id);
