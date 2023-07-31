@@ -3,7 +3,6 @@ SET DEFINE OFF
 CREATE OR REPLACE PACKAGE BODY deploy_utils
 -- File deploy_utils_body.sql
 -- Author: dheltzel
--- Create Date 2014-04-21
  AS
   lc_svn_id    VARCHAR2(200) := 'deploy_utils_body.sql dheltzel';
   lv_proc_name err_log.proc_name%TYPE;

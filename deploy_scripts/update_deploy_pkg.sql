@@ -1,6 +1,5 @@
 -- update_deploy_pkg.sql
 -- Author: dheltzel
--- Create Date 2014-04-22
 
 -- Update packages
 SET feed OFF

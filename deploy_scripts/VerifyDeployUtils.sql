@@ -2,7 +2,6 @@
 --
 -- VerifyDeployUtils.sql
 -- Author: dheltzel
--- Create Date 2014-04-22
 
 SET serverout ON SIZE UNLIMITED
 SET feed OFF

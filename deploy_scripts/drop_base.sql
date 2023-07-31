@@ -1,6 +1,5 @@
 -- drop_base.sql
 -- Author: dheltzel
--- Create Date 2014-01-08
 
 drop package AUDIT_PKG;
 drop package DEPLOY_UTILS;

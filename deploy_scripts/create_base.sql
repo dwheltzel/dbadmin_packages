@@ -1,6 +1,5 @@
 -- create_base.sql
 -- Author: dheltzel
--- Create Date 2014-04-22
 
 SET serverout ON SIZE UNLIMITED
 SET feed OFF
@@ -28,7 +27,6 @@ SPOOL /home/oracle/logs/&spool_name
 --GRANT EXECUTE ON sys.dbms_lock TO dbadmin;
 
 -- Create tables
---@tables/registrytable.sql
 PROMPT pkg_run_log.sql
 @tables/pkg_run_log.sql
 PROMPT err_log.sql
@@ -41,6 +39,8 @@ PROMPT custom_except_handling.sql
 @tables/custom_except_handling.sql
 PROMPT action_audit_log.sql
 @tables/action_audit_log.sql
+PROMPT registrytable.sql
+@tables/registrytable.sql
 
 -- Create packages
 PROMPT audit_pkg_spec.sql
@@ -55,7 +55,8 @@ PROMPT deploy_utils_body.sql
 @packages/deploy_utils_body.sql
 
 --PROMPT Verify the deploy is correct
---BEGIN deploy_utils.pkg_info; END;
---/
+BEGIN deploy_utils.pkg_info; END;
+/
+
 SPOOL OFF
 EXIT

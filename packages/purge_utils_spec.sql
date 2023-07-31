@@ -1,16 +1,15 @@
 SET DEFINE OFF
 
-CREATE OR REPLACE PACKAGE purge_utils
--- File purge_utils_spec.sql
+CREATE OR REPLACE PACKAGE trim_utils
+-- File trim_utils_spec.sql
 -- Author: dheltzel
--- Create Date 2013-11-20
 AUTHID CURRENT_USER AS
 
   -- Rename partitions and subpartitions with system generated names
   PROCEDURE part_rename_api_request_log;
 
   -- Generic proc to process SQL on a large table
-  PROCEDURE purge_large_table(p_owner           VARCHAR2,
+  PROCEDURE trim_large_table(p_owner           VARCHAR2,
                               p_table_name      VARCHAR2,
                               p_sql             VARCHAR2,
                               p_keep_days       PLS_INTEGER DEFAULT 365,
@@ -23,22 +22,22 @@ AUTHID CURRENT_USER AS
                               p_log_always      VARCHAR2 DEFAULT 'N');
 
   -- Generic proc to delete records from a small table
-  PROCEDURE purge_small_table(p_owner      VARCHAR2,
+  PROCEDURE trim_small_table(p_owner      VARCHAR2,
                               p_table_name VARCHAR2,
                               p_sql        VARCHAR2,
                               p_log_always VARCHAR2 DEFAULT 'N');
 
-  PROCEDURE purge_par_exec_tasks(p_days PLS_INTEGER DEFAULT 7);
+  PROCEDURE trim_par_exec_tasks(p_days PLS_INTEGER DEFAULT 7);
 
-  /* Master purge procedures
+  /* Master trim procedures
   These call the other procedures with standard params for each environment
   */
-  PROCEDURE qa_routine_purge;
+  PROCEDURE qa_routine_trim;
 
-  PROCEDURE stage_routine_purge;
+  PROCEDURE stage_routine_trim;
 
-  PROCEDURE prod_routine_purge;
+  PROCEDURE prod_routine_trim;
 
-END purge_utils;
+END trim_utils;
 /
 SHOW ERRORS

@@ -4,7 +4,6 @@ CREATE OR REPLACE PACKAGE registry IS
 
   -- File registry_spec.sql
   -- Author: dheltzel
-  -- Create Date 2013-11-20
   /*  Purpose : Provide generic but flexible access to key-values pairs
   
     Namespace - Developer defined, these exist as they are used. Be sure to pick something that will be unique to your project

@@ -4,7 +4,6 @@ CREATE OR REPLACE PACKAGE audit_pkg IS
 
   -- File audit_pkg_spec.sql
   -- Author: dheltzel
-  -- Create Date 2014-01-08
   PROCEDURE test_harness_log_error;
 
   PROCEDURE log_detailed_error(p_source_file err_log.source_file%TYPE,

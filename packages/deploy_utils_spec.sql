@@ -3,7 +3,6 @@ SET DEFINE OFF
 CREATE OR REPLACE PACKAGE deploy_utils
 -- File deploy_utils_spec.sql
 -- Author: dheltzel
--- Create Date 2014-04-21
 AUTHID CURRENT_USER AS
 
   /* Utility programs for deployments

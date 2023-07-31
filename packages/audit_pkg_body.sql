@@ -3,7 +3,6 @@ SET DEFINE OFF
 CREATE OR REPLACE PACKAGE BODY audit_pkg IS
   -- File audit_pkg_body.sql
   -- Author: dheltzel
-  -- Create Date 2014-03-26
   lc_svn_id VARCHAR2(200) := 'audit_pkg_body.sql dheltzel';
 
   lv_proc_name err_log.proc_name%TYPE;

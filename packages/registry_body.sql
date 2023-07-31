@@ -4,7 +4,6 @@ CREATE OR REPLACE PACKAGE BODY registry IS
 
   -- File registry_body.sql
   -- Author: dheltzel
-  -- Create Date 2013-11-20
   lc_svn_id VARCHAR2(200) := 'registry_body.sql dheltzel';
 
   lv_proc_name err_log.proc_name%TYPE;

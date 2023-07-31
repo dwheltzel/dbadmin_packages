@@ -1,11 +1,10 @@
 -- File err_log.sql
 -- Author: dheltzel
--- Create Date: 2014-01-08
 
-create table ERR_LOG
+create table ERR_LOG_T
 (
-  TIMESTAMP    TIMESTAMP(6),
-  USER_NAME    VARCHAR2(30),
+  LOG_DATE     DATE default SYSDATE not null,
+  USER_NAME    VARCHAR2(30) default USER not null,
   ERROR_TYPE   VARCHAR2(30) default 'PLSQL',
   EDITION      VARCHAR2(30),
   PROC_NAME    VARCHAR2(30),
@@ -19,16 +18,22 @@ create table ERR_LOG
   PLSQL_LINE   INTEGER,
   SQLCODE      VARCHAR2(30),
   SQLERRM      VARCHAR2(4000)
+)
+PARTITION BY RANGE(LOG_DATE) INTERVAL(numtoyminterval(1,'MONTH')) 
+(
+ PARTITION error_log_2023_10 VALUES LESS THAN (to_date('2023-11-01','YYYY-MM-DD')) 
 );
 
-comment on table ERR_LOG is 'Repository of database application errors';
-comment on column ERR_LOG.TIMESTAMP is 'Time that error occured';
-comment on column ERR_LOG.USER_NAME is 'Login name of the session - sys_context(''USERENV'', ''SESSION_USER'')';
-comment on column ERR_LOG.ERROR_TYPE is 'Type of error - default to PL/SQL code error';
-comment on column ERR_LOG.PROC_NAME is 'Name of the procedure being invoked';
-comment on column ERR_LOG.ERROR_LOC is 'Comment set in code to help locate code section with error';
-comment on column ERR_LOG.ERROR_DATA is 'Data values optionally sent to help debug error';
-comment on column ERR_LOG.SQLCODE is 'Value of SQLCODE';
-comment on column ERR_LOG.SQLERRM is 'Value of SQLERRM';
+comment on table ERR_LOG_T is 'Repository of database application errors';
+comment on column ERR_LOG_T.LOG_DATE is 'Time that error occured';
+comment on column ERR_LOG_T.USER_NAME is 'Login name of the session - sys_context(''USERENV'', ''SESSION_USER'')';
+comment on column ERR_LOG_T.ERROR_TYPE is 'Type of error - default to PL/SQL code error';
+comment on column ERR_LOG_T.PROC_NAME is 'Name of the procedure being invoked';
+comment on column ERR_LOG_T.ERROR_LOC is 'Comment set in code to help locate code section with error';
+comment on column ERR_LOG_T.ERROR_DATA is 'Data values optionally sent to help debug error';
+comment on column ERR_LOG_T.SQLCODE is 'Value of SQLCODE';
+comment on column ERR_LOG_T.SQLERRM is 'Value of SQLERRM';
 
-create index ERR_LOG_TS on ERR_LOG (TIMESTAMP);
+create index ERR_LOG_DATE on ERR_LOG_T (LOG_DATE);
+
+CREATE OR REPLACE VIEW ERR_LOG AS select * from ERR_LOG_T;

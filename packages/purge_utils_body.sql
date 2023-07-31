@@ -1,12 +1,11 @@
 SET DEFINE OFF
 
-CREATE OR REPLACE PACKAGE BODY purge_utils
--- File purge_utils_body.sql
+CREATE OR REPLACE PACKAGE BODY trim_utils
+-- File trim_utils_body.sql
 -- Author: dheltzel
--- Create Date 2013-11-20
  AS
 
-  lc_svn_id VARCHAR2(200) := 'purge_utils_body.sql dheltzel';
+  lc_svn_id VARCHAR2(200) := 'trim_utils_body.sql dheltzel';
 
   lv_proc_name err_log.proc_name%TYPE;
 
@@ -99,7 +98,7 @@ CREATE OR REPLACE PACKAGE BODY purge_utils
     RETURN(RESULT);
   END chk_settings;
 
-  PROCEDURE purge_large_table(p_owner           VARCHAR2,
+  PROCEDURE trim_large_table(p_owner           VARCHAR2,
                               p_table_name      VARCHAR2,
                               p_sql             VARCHAR2,
                               p_keep_days       PLS_INTEGER DEFAULT 365,
@@ -122,7 +121,7 @@ CREATE OR REPLACE PACKAGE BODY purge_utils
     l_commit_interval  PLS_INTEGER := p_commit_interval;
     l_chkpnt_interval  PLS_INTEGER := p_chkpnt_interval;
   BEGIN
-    lv_proc_name := 'purge_large_table';
+    lv_proc_name := 'trim_large_table';
     lv_comment   := 'Report runtime parameters';
     dbms_application_info.set_module(lv_proc_name, p_table_name);
     dbms_application_info.set_client_info('Starting up');
@@ -194,7 +193,7 @@ CREATE OR REPLACE PACKAGE BODY purge_utils
                                                 l_sleep_time || ' secs:' ||
                                                 l_chkpnt_interval || ')');
           -- before we sleep, check the registry table for updates
-          -- See if we should quit the purge
+          -- See if we should quit the trim
           lv_comment       := 'Check for new runtime params';
           l_registry_value := chk_settings(p_table_name || '_QUIT');
           IF l_registry_value IS NOT NULL THEN
@@ -265,16 +264,16 @@ CREATE OR REPLACE PACKAGE BODY purge_utils
                                   $$PLSQL_LINE,
                                   SQLCODE,
                                   SQLERRM);
-  END purge_large_table;
+  END trim_large_table;
 
   -- Generic proc to delete records from a small table
-  PROCEDURE purge_small_table(p_owner      VARCHAR2,
+  PROCEDURE trim_small_table(p_owner      VARCHAR2,
                               p_table_name VARCHAR2,
                               p_sql        VARCHAR2,
                               p_log_always VARCHAR2 DEFAULT 'N') IS
     l_deleted_recs PLS_INTEGER := 0;
   BEGIN
-    lv_proc_name := 'purge_small_table';
+    lv_proc_name := 'trim_small_table';
     lv_comment   := 'Report runtime parameters';
     dbms_application_info.set_module(lv_proc_name, p_table_name);
     dbms_application_info.set_client_info('Starting up');
@@ -302,12 +301,12 @@ CREATE OR REPLACE PACKAGE BODY purge_utils
                                   $$PLSQL_LINE,
                                   SQLCODE,
                                   SQLERRM);
-  END purge_small_table;
+  END trim_small_table;
 
-  PROCEDURE purge_par_exec_tasks(p_days PLS_INTEGER DEFAULT 7) IS
+  PROCEDURE trim_par_exec_tasks(p_days PLS_INTEGER DEFAULT 7) IS
     v_cnt PLS_INTEGER;
   BEGIN
-    lv_proc_name := 'purge_par_exec_tasks';
+    lv_proc_name := 'trim_par_exec_tasks';
     SELECT COUNT(DISTINCT task_name)
       INTO v_cnt
       FROM sys.dba_parallel_execute_chunks
@@ -340,15 +339,15 @@ CREATE OR REPLACE PACKAGE BODY purge_utils
                                   $$PLSQL_LINE,
                                   SQLCODE,
                                   SQLERRM);
-  END purge_par_exec_tasks;
+  END trim_par_exec_tasks;
 
-  /* Master purge procedures
+  /* Master trim procedures
   These call the other procedures with standard params for each environment
   */
-  PROCEDURE qa_routine_purge IS
+  PROCEDURE qa_routine_trim IS
   BEGIN
-    lv_proc_name := 'qa_routine_purge';
-    purge_par_exec_tasks;
+    lv_proc_name := 'qa_routine_trim';
+    trim_par_exec_tasks;
   EXCEPTION
     WHEN OTHERS THEN
       audit_pkg.log_error(lc_svn_id,
@@ -359,12 +358,12 @@ CREATE OR REPLACE PACKAGE BODY purge_utils
                                   $$PLSQL_LINE,
                                   SQLCODE,
                                   SQLERRM);
-  END qa_routine_purge;
+  END qa_routine_trim;
 
-  PROCEDURE stage_routine_purge IS
+  PROCEDURE stage_routine_trim IS
   BEGIN
-    lv_proc_name := 'stage_routine_purge';
-    purge_par_exec_tasks;
+    lv_proc_name := 'stage_routine_trim';
+    trim_par_exec_tasks;
   EXCEPTION
     WHEN OTHERS THEN
       audit_pkg.log_error(lc_svn_id,
@@ -375,12 +374,12 @@ CREATE OR REPLACE PACKAGE BODY purge_utils
                                   $$PLSQL_LINE,
                                   SQLCODE,
                                   SQLERRM);
-  END stage_routine_purge;
+  END stage_routine_trim;
 
-  PROCEDURE prod_routine_purge IS
+  PROCEDURE prod_routine_trim IS
   BEGIN
-    lv_proc_name := 'prod_routine_purge';
-    purge_par_exec_tasks;
+    lv_proc_name := 'prod_routine_trim';
+    trim_par_exec_tasks;
   EXCEPTION
     WHEN OTHERS THEN
       audit_pkg.log_error(lc_svn_id,
@@ -391,10 +390,10 @@ CREATE OR REPLACE PACKAGE BODY purge_utils
                                   $$PLSQL_LINE,
                                   SQLCODE,
                                   SQLERRM);
-  END prod_routine_purge;
+  END prod_routine_trim;
 
 BEGIN
   audit_pkg.log_pkg_init($$PLSQL_UNIT, lc_svn_id);
-END purge_utils;
+END trim_utils;
 /
 SHOW ERRORS
