@@ -1,7 +1,7 @@
 CREATE OR REPLACE PACKAGE BODY PKG_DEPLOY_UTILS
 -- Author: dheltzel
  AS
-  LC_SVN_ID    VARCHAR2(200) := 'deploy_utils_body.sql dheltzel';
+  LC_SVN_ID    VARCHAR2(200) := 'pkg_deploy_utils_body.sql dheltzel';
   LV_PROC_NAME ERR_LOG.PROC_NAME%TYPE;
   LV_COMMENT   ERR_LOG.ERROR_LOC%TYPE := 'Starting';
 
@@ -21,13 +21,13 @@ CREATE OR REPLACE PACKAGE BODY PKG_DEPLOY_UTILS
     DBMS_OUTPUT.PUT_LINE('$Revision: 4120 $');
     DBMS_OUTPUT.PUT_LINE('Date: 2014-04-21 11:11:42 -0400 (Mon, 21 Apr 2014) $');
     DBMS_OUTPUT.PUT_LINE('$Author: dheltzel $');
-    DBMS_OUTPUT.PUT_LINE('deploy_utils_body.sql 4120 2014-04-21 15:11:42Z dheltzel $');
+    DBMS_OUTPUT.PUT_LINE('pkg_deploy_utils_body.sql 4120 2014-04-21 15:11:42Z dheltzel $');
     LV_COMMENT := 'Getting the current edition';
     SELECT SYS_CONTEXT('USERENV', 'CURRENT_EDITION_NAME')
       INTO V_EDITION
       FROM DUAL;
     DBMS_OUTPUT.PUT_LINE('Edition: ' || V_EDITION);
-    AUDIT_PKG.LOG_ERROR(LC_SVN_ID,
+    pkg_audit.log_error(LC_SVN_ID,
                         LV_PROC_NAME,
                         LV_COMMENT,
                         V_EDITION,
@@ -37,7 +37,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_DEPLOY_UTILS
                         SQLERRM);
   EXCEPTION
     WHEN OTHERS THEN
-      AUDIT_PKG.LOG_ERROR(LC_SVN_ID,
+      pkg_audit.log_error(LC_SVN_ID,
                           LV_PROC_NAME,
                           LV_COMMENT,
                           V_EDITION,
@@ -69,7 +69,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_DEPLOY_UTILS
     LV_PROC_NAME     := 'initialize_deploy';
     CURRENT_RELEASE  := P_RELEASE_NAME;
     CURRENT_REVISION := P_SVN_REVISION;
-    AUDIT_PKG.LOG_DDL_CHANGE(P_RELEASE_NAME,
+    pkg_audit.log_ddl_change(P_RELEASE_NAME,
                              P_SVN_REVISION,
                              'DEPLOY',
                              NULL,
@@ -79,7 +79,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_DEPLOY_UTILS
                              P_SVN_ID);
   EXCEPTION
     WHEN OTHERS THEN
-      AUDIT_PKG.LOG_ERROR(LC_SVN_ID,
+      pkg_audit.log_error(LC_SVN_ID,
                           LV_PROC_NAME,
                           LV_COMMENT,
                           '',
@@ -98,7 +98,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_DEPLOY_UTILS
     RETURN(CURRENT_RELEASE);
   EXCEPTION
     WHEN OTHERS THEN
-      AUDIT_PKG.LOG_ERROR(LC_SVN_ID,
+      pkg_audit.log_error(LC_SVN_ID,
                           LV_PROC_NAME,
                           LV_COMMENT,
                           '',
@@ -117,7 +117,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_DEPLOY_UTILS
     RETURN(CURRENT_REVISION);
   EXCEPTION
     WHEN OTHERS THEN
-      AUDIT_PKG.LOG_ERROR(LC_SVN_ID,
+      pkg_audit.log_error(LC_SVN_ID,
                           LV_PROC_NAME,
                           LV_COMMENT,
                           '',
@@ -145,7 +145,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_DEPLOY_UTILS
     END IF;
   EXCEPTION
     WHEN OTHERS THEN
-      AUDIT_PKG.LOG_ERROR(LC_SVN_ID,
+      pkg_audit.log_error(LC_SVN_ID,
                           LV_PROC_NAME,
                           LV_COMMENT,
                           '',
@@ -162,10 +162,10 @@ CREATE OR REPLACE PACKAGE BODY PKG_DEPLOY_UTILS
   PROCEDURE LOG_DEPLOY_INFO(P_NAME VARCHAR2, P_SVN_ID VARCHAR2) IS
   BEGIN
     LV_PROC_NAME := 'log_deploy_info';
-    AUDIT_PKG.LOG_PKG_INIT(P_NAME, P_SVN_ID);
+    pkg_audit.log_pkg_init(P_NAME, P_SVN_ID);
   EXCEPTION
     WHEN OTHERS THEN
-      AUDIT_PKG.LOG_ERROR(LC_SVN_ID,
+      pkg_audit.log_error(LC_SVN_ID,
                           LV_PROC_NAME,
                           LV_COMMENT,
                           '',
@@ -195,7 +195,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_DEPLOY_UTILS
     END IF;
   EXCEPTION
     WHEN OTHERS THEN
-      AUDIT_PKG.LOG_ERROR(LC_SVN_ID,
+      pkg_audit.log_error(LC_SVN_ID,
                           LV_PROC_NAME,
                           LV_COMMENT,
                           '',
@@ -223,7 +223,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_DEPLOY_UTILS
     END IF;
   EXCEPTION
     WHEN OTHERS THEN
-      AUDIT_PKG.LOG_ERROR(LC_SVN_ID,
+      pkg_audit.log_error(LC_SVN_ID,
                           LV_PROC_NAME,
                           LV_COMMENT,
                           '',
@@ -242,7 +242,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_DEPLOY_UTILS
       RETURN TRUE;
     EXCEPTION
       WHEN OTHERS THEN
-        audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, '', $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
+        pkg_audit.log_error(lc_svn_id, lv_proc_name, lv_comment, '', $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
         RETURN TRUE;
     END is_cust_facing_db;
   
@@ -258,7 +258,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_DEPLOY_UTILS
       RETURN v_sessions;
     EXCEPTION
       WHEN OTHERS THEN
-        audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, '', $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
+        pkg_audit.log_error(lc_svn_id, lv_proc_name, lv_comment, '', $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
         RETURN 1;
     END conflicting_sessions;
   
@@ -278,7 +278,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_DEPLOY_UTILS
       END IF;
     EXCEPTION
       WHEN OTHERS THEN
-        audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, '', $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
+        pkg_audit.log_error(lc_svn_id, lv_proc_name, lv_comment, '', $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
         RETURN TRUE;
     END using_default_edition;
   
@@ -292,7 +292,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_DEPLOY_UTILS
       END IF;
     EXCEPTION
       WHEN OTHERS THEN
-        audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, '', $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
+        pkg_audit.log_error(lc_svn_id, lv_proc_name, lv_comment, '', $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
         RETURN FALSE;
     END deploy_enabled;
   
@@ -325,12 +325,12 @@ CREATE OR REPLACE PACKAGE BODY PKG_DEPLOY_UTILS
                             crec.name;
         EXCEPTION
           WHEN OTHERS THEN
-            audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, '', $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
+            pkg_audit.log_error(lc_svn_id, lv_proc_name, lv_comment, '', $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
         END;
       END LOOP;
     EXCEPTION
       WHEN OTHERS THEN
-        audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, '', $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
+        pkg_audit.log_error(lc_svn_id, lv_proc_name, lv_comment, '', $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
     END fix_synonyms_for_user;
   
     -- Creates any missing synonyms for the user specified.
@@ -357,7 +357,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_DEPLOY_UTILS
       END LOOP;
     EXCEPTION
       WHEN OTHERS THEN
-        audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, p_username, $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
+        pkg_audit.log_error(lc_svn_id, lv_proc_name, lv_comment, p_username, $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
     END fix_synonyms_for_user;
   
     -- Creates any missing synonyms for all users.
@@ -374,7 +374,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_DEPLOY_UTILS
       END LOOP;
     EXCEPTION
       WHEN OTHERS THEN
-        audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, '', $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
+        pkg_audit.log_error(lc_svn_id, lv_proc_name, lv_comment, '', $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
     END fix_synonyms_for_all_users;
   
     PROCEDURE create_synonyms(p_obj_owner VARCHAR, p_obj_name VARCHAR) IS
@@ -398,7 +398,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_DEPLOY_UTILS
       END LOOP;
     EXCEPTION
       WHEN OTHERS THEN
-        audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, p_obj_owner || '.' ||
+        pkg_audit.log_error(lc_svn_id, lv_proc_name, lv_comment, p_obj_owner || '.' ||
                                      p_obj_name, $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
     END create_synonyms;
   
@@ -421,7 +421,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_DEPLOY_UTILS
       lv_comment := 'Making grants';
     EXCEPTION
       WHEN OTHERS THEN
-        audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, p_obj_type || ' ' ||
+        pkg_audit.log_error(lc_svn_id, lv_proc_name, lv_comment, p_obj_type || ' ' ||
                                      p_obj_owner || '.' ||
                                      p_obj_name, $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
     END synonyms_grants;
@@ -499,7 +499,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_DEPLOY_UTILS
     END LOOP;
   EXCEPTION
     WHEN OTHERS THEN
-      AUDIT_PKG.LOG_ERROR(LC_SVN_ID,
+      pkg_audit.log_error(LC_SVN_ID,
                           LV_PROC_NAME,
                           LV_COMMENT,
                           '',
@@ -528,7 +528,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_DEPLOY_UTILS
       EXECUTE IMMEDIATE 'CREATE USER ' || P_SCHEMA ||
                         ' IDENTIFIED BY "D(FB2346----32DF" DEFAULT TABLESPACE DATA1 QUOTA UNLIMITED ON DATA1 ENABLE EDITIONS ACCOUNT LOCK';
       LV_COMMENT := 'Logging change';
-      AUDIT_PKG.LOG_DDL_CHANGE(NULL,
+      pkg_audit.log_ddl_change(NULL,
                                P_SCHEMA,
                                'SCHEMA',
                                NULL,
@@ -540,7 +540,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_DEPLOY_UTILS
         EXECUTE IMMEDIATE 'GRANT RESOURCE TO ' || P_SCHEMA;
       EXCEPTION
         WHEN OTHERS THEN
-          AUDIT_PKG.LOG_ERROR(LC_SVN_ID,
+          pkg_audit.log_error(LC_SVN_ID,
                               LV_PROC_NAME,
                               LV_COMMENT,
                               P_TICKET || ' ' || P_SCHEMA,
@@ -553,7 +553,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_DEPLOY_UTILS
         EXECUTE IMMEDIATE 'REVOKE CONNECT FROM ' || P_SCHEMA;
       EXCEPTION
         WHEN OTHERS THEN
-          AUDIT_PKG.LOG_ERROR(LC_SVN_ID,
+          pkg_audit.log_error(LC_SVN_ID,
                               LV_PROC_NAME,
                               LV_COMMENT,
                               P_TICKET,
@@ -569,7 +569,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_DEPLOY_UTILS
     END IF;
   EXCEPTION
     WHEN OTHERS THEN
-      AUDIT_PKG.LOG_ERROR(LC_SVN_ID,
+      pkg_audit.log_error(LC_SVN_ID,
                           LV_PROC_NAME,
                           LV_COMMENT,
                           P_TICKET,
@@ -602,7 +602,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_DEPLOY_UTILS
       IF (P_PARTITIONED_SQL IS NOT NULL) AND IS_PARTITIONED_DB THEN
         EXECUTE IMMEDIATE P_PARTITIONED_SQL;
         LV_COMMENT := 'Logging create partitioned table';
-        AUDIT_PKG.LOG_DDL_CHANGE(P_TABLE_OWNER,
+        pkg_audit.log_ddl_change(P_TABLE_OWNER,
                                  P_TABLE_NAME,
                                  'TABLE',
                                  P_TABLE_OWNER,
@@ -613,7 +613,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_DEPLOY_UTILS
       ELSE
         EXECUTE IMMEDIATE P_SQL;
         LV_COMMENT := 'Logging create table';
-        AUDIT_PKG.LOG_DDL_CHANGE(P_TABLE_OWNER,
+        pkg_audit.log_ddl_change(P_TABLE_OWNER,
                                  P_TABLE_NAME,
                                  'TABLE',
                                  P_TABLE_OWNER,
@@ -634,7 +634,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_DEPLOY_UTILS
     END IF;
   EXCEPTION
     WHEN OTHERS THEN
-      AUDIT_PKG.LOG_ERROR(LC_SVN_ID,
+      pkg_audit.log_error(LC_SVN_ID,
                           LV_PROC_NAME,
                           LV_COMMENT,
                           P_TICKET || ' ' || P_TABLE_OWNER || ' ' ||
@@ -668,7 +668,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_DEPLOY_UTILS
       LV_COMMENT := 'Creating';
       EXECUTE IMMEDIATE P_SQL;
       LV_COMMENT := 'Logging change';
-      AUDIT_PKG.LOG_DDL_CHANGE(P_TABLE_OWNER,
+      pkg_audit.log_ddl_change(P_TABLE_OWNER,
                                P_COL_NAME,
                                'COLUMN',
                                P_TABLE_NAME,
@@ -690,7 +690,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_DEPLOY_UTILS
     END IF;
   EXCEPTION
     WHEN OTHERS THEN
-      AUDIT_PKG.LOG_ERROR(LC_SVN_ID,
+      pkg_audit.log_error(LC_SVN_ID,
                           LV_PROC_NAME,
                           LV_COMMENT,
                           P_TICKET || ' ' || P_TABLE_OWNER || ' ' ||
@@ -726,7 +726,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_DEPLOY_UTILS
       IF (P_PARTITIONED_SQL IS NOT NULL) AND IS_PARTITIONED_DB THEN
         EXECUTE IMMEDIATE P_PARTITIONED_SQL;
         LV_COMMENT := 'Logging create partitioned index';
-        AUDIT_PKG.LOG_DDL_CHANGE(P_TABLE_OWNER,
+        pkg_audit.log_ddl_change(P_TABLE_OWNER,
                                  P_INDEX_NAME,
                                  'INDEX',
                                  P_TABLE_NAME,
@@ -737,7 +737,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_DEPLOY_UTILS
       ELSE
         EXECUTE IMMEDIATE P_SQL;
         LV_COMMENT := 'Logging create index';
-        AUDIT_PKG.LOG_DDL_CHANGE(P_TABLE_OWNER,
+        pkg_audit.log_ddl_change(P_TABLE_OWNER,
                                  P_INDEX_NAME,
                                  'INDEX',
                                  P_TABLE_NAME,
@@ -754,7 +754,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_DEPLOY_UTILS
     END IF;
   EXCEPTION
     WHEN OTHERS THEN
-      AUDIT_PKG.LOG_ERROR(LC_SVN_ID,
+      pkg_audit.log_error(LC_SVN_ID,
                           LV_PROC_NAME,
                           LV_COMMENT,
                           P_TICKET || ' ' || P_TABLE_OWNER || ' ' ||
@@ -792,7 +792,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_DEPLOY_UTILS
       END IF;
       EXECUTE IMMEDIATE V_SQL;
       LV_COMMENT := 'Logging change';
-      AUDIT_PKG.LOG_DDL_CHANGE(P_OWNER,
+      pkg_audit.log_ddl_change(P_OWNER,
                                P_SEQ_NAME,
                                'SEQUENCE',
                                NULL,
@@ -807,7 +807,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_DEPLOY_UTILS
     END IF;
   EXCEPTION
     WHEN OTHERS THEN
-      AUDIT_PKG.LOG_ERROR(LC_SVN_ID,
+      pkg_audit.log_error(LC_SVN_ID,
                           LV_PROC_NAME,
                           LV_COMMENT,
                           P_TICKET || ' ' || P_OWNER || ' ' || P_SEQ_NAME,
@@ -847,7 +847,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_DEPLOY_UTILS
     END IF;
   EXCEPTION
     WHEN OTHERS THEN
-      AUDIT_PKG.LOG_ERROR(LC_SVN_ID,
+      pkg_audit.log_error(LC_SVN_ID,
                           LV_PROC_NAME,
                           LV_COMMENT,
                           P_TICKET || ' ' || CUST_SEQ_SCHEMA || ' ' ||
@@ -881,7 +881,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_DEPLOY_UTILS
       LV_COMMENT := 'Creating';
       EXECUTE IMMEDIATE P_SQL;
       LV_COMMENT := 'Logging change';
-      AUDIT_PKG.LOG_DDL_CHANGE(P_TABLE_OWNER,
+      pkg_audit.log_ddl_change(P_TABLE_OWNER,
                                P_CONSTRAINT_NAME,
                                'CONSTRAINT',
                                P_TABLE_NAME,
@@ -897,7 +897,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_DEPLOY_UTILS
     END IF;
   EXCEPTION
     WHEN OTHERS THEN
-      AUDIT_PKG.LOG_ERROR(LC_SVN_ID,
+      pkg_audit.log_error(LC_SVN_ID,
                           LV_PROC_NAME,
                           LV_COMMENT,
                           P_TICKET || ' ' || P_TABLE_OWNER || ' ' ||
@@ -929,7 +929,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_DEPLOY_UTILS
       LV_COMMENT := 'Creating job';
       EXECUTE IMMEDIATE P_SQL;
       LV_COMMENT := 'Logging change';
-      AUDIT_PKG.LOG_DDL_CHANGE(P_OWNER,
+      pkg_audit.log_ddl_change(P_OWNER,
                                P_JOB_NAME,
                                'JOB',
                                NULL,
@@ -944,7 +944,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_DEPLOY_UTILS
     END IF;
   EXCEPTION
     WHEN OTHERS THEN
-      AUDIT_PKG.LOG_ERROR(LC_SVN_ID,
+      pkg_audit.log_error(LC_SVN_ID,
                           LV_PROC_NAME,
                           LV_COMMENT,
                           P_TICKET || ' ' || P_OWNER || ' ' || P_JOB_NAME,
@@ -977,7 +977,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_DEPLOY_UTILS
       LV_COMMENT := 'Altering';
       EXECUTE IMMEDIATE P_SQL;
       LV_COMMENT := 'Logging change';
-      AUDIT_PKG.LOG_DDL_CHANGE(P_TABLE_OWNER,
+      pkg_audit.log_ddl_change(P_TABLE_OWNER,
                                P_COL_NAME,
                                'COLUMN',
                                P_TABLE_NAME,
@@ -999,7 +999,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_DEPLOY_UTILS
     END IF;
   EXCEPTION
     WHEN OTHERS THEN
-      AUDIT_PKG.LOG_ERROR(LC_SVN_ID,
+      pkg_audit.log_error(LC_SVN_ID,
                           LV_PROC_NAME,
                           LV_COMMENT,
                           P_TICKET || ' ' || P_TABLE_OWNER || ' ' ||
@@ -1019,7 +1019,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_DEPLOY_UTILS
   BEGIN
     LV_PROC_NAME := 'deploy_ddl';
     EXECUTE IMMEDIATE P_SQL;
-    AUDIT_PKG.LOG_DDL_CHANGE(NULL,
+    pkg_audit.log_ddl_change(NULL,
                              NULL,
                              NULL,
                              NULL,
@@ -1033,7 +1033,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_DEPLOY_UTILS
     END IF;
   EXCEPTION
     WHEN OTHERS THEN
-      AUDIT_PKG.LOG_ERROR(LC_SVN_ID,
+      pkg_audit.log_error(LC_SVN_ID,
                           LV_PROC_NAME,
                           LV_COMMENT,
                           P_TICKET,
@@ -1068,7 +1068,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_DEPLOY_UTILS
           LV_COMMENT := 'Dropping ' || P_NAME || ' job';
           SYS.DBMS_SCHEDULER.DROP_JOB(P_OWNER || '.' || P_NAME);
           LV_COMMENT := 'Logging change';
-          AUDIT_PKG.LOG_DDL_CHANGE(P_OWNER,
+          pkg_audit.log_ddl_change(P_OWNER,
                                    P_NAME,
                                    P_TYPE,
                                    NULL,
@@ -1098,7 +1098,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_DEPLOY_UTILS
           EXECUTE IMMEDIATE 'alter table ' || P_OWNER || '.' || L_PARENT ||
                             ' drop constraint ' || P_NAME;
           LV_COMMENT := 'Logging change';
-          AUDIT_PKG.LOG_DDL_CHANGE(P_OWNER,
+          pkg_audit.log_ddl_change(P_OWNER,
                                    P_NAME,
                                    P_TYPE,
                                    NULL,
@@ -1128,7 +1128,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_DEPLOY_UTILS
           EXECUTE IMMEDIATE 'alter table ' || P_OWNER || '.' || L_PARENT ||
                             ' drop column ' || P_NAME;
           LV_COMMENT := 'Logging change';
-          AUDIT_PKG.LOG_DDL_CHANGE(P_OWNER,
+          pkg_audit.log_ddl_change(P_OWNER,
                                    P_NAME,
                                    P_TYPE,
                                    NULL,
@@ -1157,7 +1157,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_DEPLOY_UTILS
           ELSE
             EXECUTE IMMEDIATE P_SQL;
             LV_COMMENT := 'Logging change';
-            AUDIT_PKG.LOG_DDL_CHANGE(P_OWNER,
+            pkg_audit.log_ddl_change(P_OWNER,
                                      P_NAME,
                                      P_TYPE,
                                      NULL,
@@ -1174,7 +1174,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_DEPLOY_UTILS
     END CASE;
   EXCEPTION
     WHEN OTHERS THEN
-      AUDIT_PKG.LOG_ERROR(LC_SVN_ID,
+      pkg_audit.log_error(LC_SVN_ID,
                           LV_PROC_NAME,
                           LV_COMMENT,
                           P_TICKET || ' ' || P_TYPE || ' ' || P_OWNER || '.' ||
@@ -1207,7 +1207,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_DEPLOY_UTILS
     RETURN SUBSTR(V_NAME, 1, 30);
   EXCEPTION
     WHEN OTHERS THEN
-      AUDIT_PKG.LOG_ERROR(LC_SVN_ID,
+      pkg_audit.log_error(LC_SVN_ID,
                           LV_PROC_NAME,
                           LV_COMMENT,
                           P_TICKET || ' ' || P_TABLE_OWNER || '.' ||
@@ -1233,7 +1233,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_DEPLOY_UTILS
     DBMS_OUTPUT.PUT_LINE(BACKUP_SCHEMA || '.' || V_NAME);
   EXCEPTION
     WHEN OTHERS THEN
-      AUDIT_PKG.LOG_ERROR(LC_SVN_ID,
+      pkg_audit.log_error(LC_SVN_ID,
                           LV_PROC_NAME,
                           LV_COMMENT,
                           P_TICKET || ' ' || P_TABLE_OWNER || '.' ||
@@ -1247,7 +1247,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_DEPLOY_UTILS
       END IF;
   END BACKUP_TABLE_NAME;
 
-  /* deploy_utils.backup_data
+  /* pkg_deploy_utils.backup_data
   This creates a backup copy of a table (or a subset of the table's rows)
   The resulting backup table name contains the ticket info and the originating schema (if needed)
   p_sql - optional select statement to only save some of the rows, default is "select *" from the table
@@ -1327,7 +1327,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_DEPLOY_UTILS
           VALUES
             (SYSDATE,
              USER,
-             'deploy_utils.backup_data',
+             'pkg_deploy_utils.backup_data',
              P_TABLE_OWNER,
              P_TABLE_NAME,
              'BACKUP',
@@ -1343,7 +1343,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_DEPLOY_UTILS
       END IF;
     EXCEPTION
       WHEN OTHERS THEN
-        AUDIT_PKG.LOG_ERROR(LC_SVN_ID,
+        pkg_audit.log_error(LC_SVN_ID,
                             LV_PROC_NAME,
                             LV_COMMENT,
                             P_TICKET || ' ' || P_TABLE_OWNER || '.' ||
@@ -1383,7 +1383,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_DEPLOY_UTILS
     END IF;
   EXCEPTION
     WHEN OTHERS THEN
-      AUDIT_PKG.LOG_ERROR(LC_SVN_ID,
+      pkg_audit.log_error(LC_SVN_ID,
                           LV_PROC_NAME,
                           LV_COMMENT,
                           P_TICKET || ' ' || P_TABLE_OWNER || '.' ||
@@ -1449,7 +1449,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_DEPLOY_UTILS
           VALUES
             (SYSDATE,
              USER,
-             'deploy_utils.trim_backup_data',
+             'pkg_deploy_utils.trim_backup_data',
              P_TABLE_OWNER,
              P_TABLE_NAME,
              'TRIM',
@@ -1463,7 +1463,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_DEPLOY_UTILS
       END IF;
     EXCEPTION
       WHEN OTHERS THEN
-        AUDIT_PKG.LOG_ERROR(LC_SVN_ID,
+        pkg_audit.log_error(LC_SVN_ID,
                             LV_PROC_NAME,
                             LV_COMMENT,
                             P_TICKET || ' ' || P_TABLE_OWNER || '.' ||
@@ -1488,7 +1488,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_DEPLOY_UTILS
     END IF;
   EXCEPTION
     WHEN OTHERS THEN
-      AUDIT_PKG.LOG_ERROR(LC_SVN_ID,
+      pkg_audit.log_error(LC_SVN_ID,
                           LV_PROC_NAME,
                           LV_COMMENT,
                           P_TICKET || ' ' || P_TABLE_OWNER || '.' ||
@@ -1503,6 +1503,6 @@ CREATE OR REPLACE PACKAGE BODY PKG_DEPLOY_UTILS
   END TRIM_BACKUP_DATA;
 
 BEGIN
-  AUDIT_PKG.LOG_PKG_INIT($$PLSQL_UNIT, LC_SVN_ID);
+  pkg_audit.log_pkg_init($$PLSQL_UNIT, LC_SVN_ID);
 END PKG_DEPLOY_UTILS;
 /

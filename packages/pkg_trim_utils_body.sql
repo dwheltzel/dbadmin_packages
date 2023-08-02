@@ -74,7 +74,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_TRIM_UTILS
     END LOOP;
   EXCEPTION
     WHEN OTHERS THEN
-      audit_pkg.log_error(lc_svn_id,
+      pkg_audit.log_error(lc_svn_id,
                                   lv_proc_name,
                                   lv_comment,
                                   'WEBAPI.API_REQUEST_LOG_',
@@ -242,7 +242,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_TRIM_UTILS
     COMMIT;
     lv_comment := 'Log final counts';
     IF (l_deleted_recs > 0 OR p_log_always = 'Y') THEN
-      audit_pkg.log_data_change(lv_proc_name,
+      pkg_audit.log_data_change(lv_proc_name,
                                 p_owner,
                                 p_table_name,
                                 'Trim',
@@ -255,7 +255,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_TRIM_UTILS
     dbms_output.put_line('Total checkpoints: ' || l_chkpnt_count);*/
   EXCEPTION
     WHEN OTHERS THEN
-      audit_pkg.log_error(lc_svn_id,
+      pkg_audit.log_error(lc_svn_id,
                                   lv_proc_name,
                                   lv_comment,
                                   p_owner || '.' || p_table_name,
@@ -282,7 +282,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_TRIM_UTILS
     COMMIT;
     lv_comment := 'Log final counts';
     IF (l_deleted_recs > 0 OR p_log_always = 'Y') THEN
-      audit_pkg.log_data_change(lv_proc_name,
+      pkg_audit.log_data_change(lv_proc_name,
                                 p_owner,
                                 p_table_name,
                                 'Trim',
@@ -292,7 +292,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_TRIM_UTILS
     END IF;
   EXCEPTION
     WHEN OTHERS THEN
-      audit_pkg.log_error(lc_svn_id,
+      pkg_audit.log_error(lc_svn_id,
                                   lv_proc_name,
                                   lv_comment,
                                   p_owner || '.' || p_table_name,
@@ -312,14 +312,14 @@ CREATE OR REPLACE PACKAGE BODY PKG_TRIM_UTILS
      WHERE end_ts < SYSDATE - p_days
        AND task_owner = USER;
     IF (v_cnt > 0) THEN
-      audit_pkg.log_action(lv_proc_name, 'Trim', 'Keep Days: ' || p_days);
+      pkg_audit.log_action(lv_proc_name, 'Trim', 'Keep Days: ' || p_days);
       FOR c_rec IN (SELECT DISTINCT task_name
                       FROM sys.dba_parallel_execute_chunks
                      WHERE end_ts < SYSDATE - p_days
                        AND task_owner = USER) LOOP
         sys.dbms_parallel_execute.drop_task(c_rec.task_name);
       END LOOP;
-      audit_pkg.log_data_change(lv_proc_name,
+      pkg_audit.log_data_change(lv_proc_name,
                                 'SYS',
                                 'DBA_PARALLEL_EXECUTE',
                                 'Trim',
@@ -330,7 +330,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_TRIM_UTILS
     END IF;
   EXCEPTION
     WHEN OTHERS THEN
-      audit_pkg.log_error(lc_svn_id,
+      pkg_audit.log_error(lc_svn_id,
                                   lv_proc_name,
                                   lv_comment,
                                   '',
@@ -349,7 +349,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_TRIM_UTILS
     trim_par_exec_tasks;
   EXCEPTION
     WHEN OTHERS THEN
-      audit_pkg.log_error(lc_svn_id,
+      pkg_audit.log_error(lc_svn_id,
                                   lv_proc_name,
                                   lv_comment,
                                   '',
@@ -365,7 +365,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_TRIM_UTILS
     trim_par_exec_tasks;
   EXCEPTION
     WHEN OTHERS THEN
-      audit_pkg.log_error(lc_svn_id,
+      pkg_audit.log_error(lc_svn_id,
                                   lv_proc_name,
                                   lv_comment,
                                   '',
@@ -381,7 +381,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_TRIM_UTILS
     trim_par_exec_tasks;
   EXCEPTION
     WHEN OTHERS THEN
-      audit_pkg.log_error(lc_svn_id,
+      pkg_audit.log_error(lc_svn_id,
                                   lv_proc_name,
                                   lv_comment,
                                   '',
@@ -392,7 +392,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_TRIM_UTILS
   END prod_routine_trim;
 
 BEGIN
-  audit_pkg.log_pkg_init($$PLSQL_UNIT, lc_svn_id);
+  pkg_audit.log_pkg_init($$PLSQL_UNIT, lc_svn_id);
 END PKG_TRIM_UTILS;
 /
 SHOW ERRORS

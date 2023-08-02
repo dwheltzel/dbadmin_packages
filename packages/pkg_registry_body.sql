@@ -18,7 +18,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_REGISTRY IS
     RETURN(pkg_namespace);
   EXCEPTION
     WHEN OTHERS THEN
-      audit_pkg.log_error(lc_svn_id,
+      pkg_audit.log_error(lc_svn_id,
                                 lv_proc_name,
                                 lv_comment,
                                 pkg_namespace,
@@ -34,7 +34,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_REGISTRY IS
     pkg_namespace := p_namespace;
   EXCEPTION
     WHEN OTHERS THEN
-      audit_pkg.log_error(lc_svn_id,
+      pkg_audit.log_error(lc_svn_id,
                                 lv_proc_name,
                                 lv_comment,
                                 p_namespace,
@@ -50,7 +50,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_REGISTRY IS
     pkg_namespace := 'DEFAULT';
   EXCEPTION
     WHEN OTHERS THEN
-      audit_pkg.log_error(lc_svn_id,
+      pkg_audit.log_error(lc_svn_id,
                                 lv_proc_name,
                                 lv_comment,
                                 pkg_namespace,
@@ -66,7 +66,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_REGISTRY IS
     RETURN(pkg_envir);
   EXCEPTION
     WHEN OTHERS THEN
-      audit_pkg.log_error(lc_svn_id,
+      pkg_audit.log_error(lc_svn_id,
                                 lv_proc_name,
                                 lv_comment,
                                 pkg_envir,
@@ -82,7 +82,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_REGISTRY IS
     pkg_envir    := p_envir;
   EXCEPTION
     WHEN OTHERS THEN
-      audit_pkg.log_error(lc_svn_id,
+      pkg_audit.log_error(lc_svn_id,
                                 lv_proc_name,
                                 lv_comment,
                                 pkg_envir,
@@ -98,7 +98,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_REGISTRY IS
     pkg_envir    := 'A';
   EXCEPTION
     WHEN OTHERS THEN
-      audit_pkg.log_error(lc_svn_id,
+      pkg_audit.log_error(lc_svn_id,
                                 lv_proc_name,
                                 lv_comment,
                                 pkg_envir,
@@ -129,7 +129,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_REGISTRY IS
     RETURN(RESULT);
   EXCEPTION
     WHEN OTHERS THEN
-      audit_pkg.log_error(lc_svn_id,
+      pkg_audit.log_error(lc_svn_id,
                                 lv_proc_name,
                                 lv_comment,
                                 p_name || ' ' || p_namespace || ' ' ||
@@ -160,7 +160,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_REGISTRY IS
     WHEN dup_val_on_index THEN
       RETURN FALSE;
     WHEN OTHERS THEN
-      audit_pkg.log_error(lc_svn_id,
+      pkg_audit.log_error(lc_svn_id,
                                 lv_proc_name,
                                 lv_comment,
                                 p_name || ' ' || p_value || ' ' ||
@@ -190,7 +190,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_REGISTRY IS
     RETURN SQL%ROWCOUNT;
   EXCEPTION
     WHEN OTHERS THEN
-      audit_pkg.log_error(lc_svn_id,
+      pkg_audit.log_error(lc_svn_id,
                                 lv_proc_name,
                                 lv_comment,
                                 p_name || ' ' || p_value || ' ' ||
@@ -212,7 +212,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_REGISTRY IS
       l_return := insert_value(p_name, p_value, p_namespace, p_envir);
     END IF;
     IF NOT l_return THEN
-      audit_pkg.log_error(lc_svn_id,
+      pkg_audit.log_error(lc_svn_id,
                                 lv_proc_name,
                                 'update failed',
                                 p_name || ' ' || p_value || ' ' ||
@@ -224,7 +224,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_REGISTRY IS
     END IF;
   EXCEPTION
     WHEN OTHERS THEN
-      audit_pkg.log_error(lc_svn_id,
+      pkg_audit.log_error(lc_svn_id,
                                 lv_proc_name,
                                 lv_comment,
                                 p_name || ' ' || p_value || ' ' ||
@@ -251,7 +251,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_REGISTRY IS
        AND immutable = 'N';
   EXCEPTION
     WHEN OTHERS THEN
-      audit_pkg.log_error(lc_svn_id,
+      pkg_audit.log_error(lc_svn_id,
                                 lv_proc_name,
                                 lv_comment,
                                 p_name || ' ' || p_namespace || ' ' ||
@@ -263,7 +263,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_REGISTRY IS
   END clear_value;
 
 BEGIN
-  audit_pkg.log_pkg_init($$PLSQL_UNIT, lc_svn_id);
+  pkg_audit.log_pkg_init($$PLSQL_UNIT, lc_svn_id);
 END PKG_REGISTRY;
 /
 SHOW ERRORS

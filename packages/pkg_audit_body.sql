@@ -1,6 +1,6 @@
 CREATE OR REPLACE PACKAGE BODY PKG_AUDIT IS
   -- Author: dheltzel
-  LC_SVN_ID VARCHAR2(200) := 'audit_pkg_body.sql dheltzel';
+  LC_SVN_ID VARCHAR2(200) := 'pkg_audit_body.sql dheltzel';
 
   LV_PROC_NAME ERR_LOG.PROC_NAME%TYPE;
 
@@ -208,7 +208,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_AUDIT IS
     -- generate rollback DDL
     IF P_OBJECT_TYPE IN
        ('TABLE', 'SEQUENCE', 'JOB', 'CONSTRAINT', 'INDEX', 'COLUMN') THEN
-      L_ROLLBACK_DDL := 'exec deploy_utils.drop_object(''' || P_TICKET ||
+      L_ROLLBACK_DDL := 'exec pkg_deploy_utils.drop_object(''' || P_TICKET ||
                         ''',''' || P_OBJECT_TYPE || ''',''' ||
                         P_OBJECT_OWNER || ''',''' || P_OBJECT_NAME || ''')';
     END IF;

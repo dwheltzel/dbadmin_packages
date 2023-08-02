@@ -145,7 +145,7 @@ AUTHID CURRENT_USER AS
 
   PROCEDURE backup_table_name(p_ticket VARCHAR, p_table_owner VARCHAR, p_table_name VARCHAR);
 
-  /* deploy_utils.backup_data
+  /* pkg_deploy_utils.backup_data
   This creates a backup copy of a table (or a subset of the table's rows)
   The resulting backup table name contains the ticket info and the originating schema (if needed)
   p_sql - optional select statement to only save some of the rows, default is "select *" from the table
