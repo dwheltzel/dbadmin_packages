@@ -1,12 +1,10 @@
-SET DEFINE OFF
-
-CREATE OR REPLACE PACKAGE BODY deploy_utils
+CREATE OR REPLACE PACKAGE BODY COMSPOC_DBA.DEPLOY_UTILS
 -- File deploy_utils_body.sql
 -- Author: dheltzel
  AS
-  lc_svn_id    VARCHAR2(200) := 'deploy_utils_body.sql dheltzel';
-  lv_proc_name err_log.proc_name%TYPE;
-  lv_comment   err_log.error_loc%TYPE := 'Starting';
+  LC_SVN_ID    VARCHAR2(200) := 'deploy_utils_body.sql dheltzel';
+  LV_PROC_NAME ERR_LOG.PROC_NAME%TYPE;
+  LV_COMMENT   ERR_LOG.ERROR_LOC%TYPE := 'Starting';
 
   /* Set and get this with the get_set_debug_level proc below
     defaults to 10, which prints everything. Setting this to:
@@ -14,155 +12,230 @@ CREATE OR REPLACE PACKAGE BODY deploy_utils
     5 - suppresses informational "success" messages, this will reduce the noise in the logs to only failed operations
     Note: exceptions will ALWAYS be written to the err_log table, and every operation is recorded in the audit tables
   */
-  lv_debug_lvl PLS_INTEGER := 10;
+  LV_DEBUG_LVL PLS_INTEGER := 10;
 
-  PROCEDURE pkg_info IS
-    v_edition VARCHAR2(35);
+  PROCEDURE PKG_INFO IS
+    V_EDITION VARCHAR2(35);
   BEGIN
-    lv_proc_name := 'pkg_info';
-    lv_comment   := 'Dumping deploy pkg info';
-    dbms_output.put_line('$Revision: 4120 $');
-    dbms_output.put_line('Date: 2014-04-21 11:11:42 -0400 (Mon, 21 Apr 2014) $');
-    dbms_output.put_line('$Author: dheltzel $');
-    dbms_output.put_line('deploy_utils_body.sql 4120 2014-04-21 15:11:42Z dheltzel $');
-    lv_comment := 'Getting the current edition';
-    SELECT sys_context('USERENV', 'CURRENT_EDITION_NAME') INTO v_edition FROM dual;
-    dbms_output.put_line('Edition: ' || v_edition);
-    audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, v_edition, $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
+    LV_PROC_NAME := 'pkg_info';
+    LV_COMMENT   := 'Dumping deploy pkg info';
+    DBMS_OUTPUT.PUT_LINE('$Revision: 4120 $');
+    DBMS_OUTPUT.PUT_LINE('Date: 2014-04-21 11:11:42 -0400 (Mon, 21 Apr 2014) $');
+    DBMS_OUTPUT.PUT_LINE('$Author: dheltzel $');
+    DBMS_OUTPUT.PUT_LINE('deploy_utils_body.sql 4120 2014-04-21 15:11:42Z dheltzel $');
+    LV_COMMENT := 'Getting the current edition';
+    SELECT SYS_CONTEXT('USERENV', 'CURRENT_EDITION_NAME')
+      INTO V_EDITION
+      FROM DUAL;
+    DBMS_OUTPUT.PUT_LINE('Edition: ' || V_EDITION);
+    AUDIT_PKG.LOG_ERROR(LC_SVN_ID,
+                        LV_PROC_NAME,
+                        LV_COMMENT,
+                        V_EDITION,
+                        $$PLSQL_UNIT,
+                        $$PLSQL_LINE,
+                        SQLCODE,
+                        SQLERRM);
   EXCEPTION
     WHEN OTHERS THEN
-      audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, v_edition, $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
-      IF lv_debug_lvl > 0 THEN
+      AUDIT_PKG.LOG_ERROR(LC_SVN_ID,
+                          LV_PROC_NAME,
+                          LV_COMMENT,
+                          V_EDITION,
+                          $$PLSQL_UNIT,
+                          $$PLSQL_LINE,
+                          SQLCODE,
+                          SQLERRM);
+      IF LV_DEBUG_LVL > 0 THEN
         RAISE;
       END IF;
-  END pkg_info;
+  END PKG_INFO;
 
   -- Get and/or Set Debug Level
-  FUNCTION get_set_debug_level(new_debug_lvl IN INTEGER DEFAULT NULL) RETURN INTEGER IS
+  FUNCTION GET_SET_DEBUG_LEVEL(NEW_DEBUG_LVL IN INTEGER DEFAULT NULL)
+    RETURN INTEGER IS
   BEGIN
-    IF new_debug_lvl IS NOT NULL THEN
-      lv_debug_lvl := new_debug_lvl;
+    IF NEW_DEBUG_LVL IS NOT NULL THEN
+      LV_DEBUG_LVL := NEW_DEBUG_LVL;
     END IF;
-    RETURN(lv_debug_lvl);
-  END get_set_debug_level;
+    RETURN(LV_DEBUG_LVL);
+  END GET_SET_DEBUG_LEVEL;
 
   -- This will setup package variables and create an initial log entry for the deploy
-  PROCEDURE initialize_deploy(p_ticket       VARCHAR,
-                              p_release_name VARCHAR2,
-                              p_svn_revision VARCHAR2,
-                              p_svn_id       VARCHAR2) IS
+  PROCEDURE INITIALIZE_DEPLOY(P_TICKET       VARCHAR,
+                              P_RELEASE_NAME VARCHAR2,
+                              P_SVN_REVISION VARCHAR2,
+                              P_SVN_ID       VARCHAR2) IS
   BEGIN
-    lv_proc_name     := 'initialize_deploy';
-    current_release  := p_release_name;
-    current_revision := p_svn_revision;
-    audit_pkg.log_ddl_change(p_release_name, p_svn_revision, 'DEPLOY', NULL, p_ticket, NULL, NULL, p_svn_id);
+    LV_PROC_NAME     := 'initialize_deploy';
+    CURRENT_RELEASE  := P_RELEASE_NAME;
+    CURRENT_REVISION := P_SVN_REVISION;
+    AUDIT_PKG.LOG_DDL_CHANGE(P_RELEASE_NAME,
+                             P_SVN_REVISION,
+                             'DEPLOY',
+                             NULL,
+                             P_TICKET,
+                             NULL,
+                             NULL,
+                             P_SVN_ID);
   EXCEPTION
     WHEN OTHERS THEN
-      audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, '', $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
-      IF lv_debug_lvl > 0 THEN
+      AUDIT_PKG.LOG_ERROR(LC_SVN_ID,
+                          LV_PROC_NAME,
+                          LV_COMMENT,
+                          '',
+                          $$PLSQL_UNIT,
+                          $$PLSQL_LINE,
+                          SQLCODE,
+                          SQLERRM);
+      IF LV_DEBUG_LVL > 0 THEN
         RAISE;
       END IF;
-  END initialize_deploy;
+  END INITIALIZE_DEPLOY;
 
-  FUNCTION get_current_release RETURN VARCHAR2 IS
+  FUNCTION GET_CURRENT_RELEASE RETURN VARCHAR2 IS
   BEGIN
-    lv_proc_name := 'get_current_release';
-    RETURN(current_release);
+    LV_PROC_NAME := 'get_current_release';
+    RETURN(CURRENT_RELEASE);
   EXCEPTION
     WHEN OTHERS THEN
-      audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, '', $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
-      IF lv_debug_lvl > 0 THEN
+      AUDIT_PKG.LOG_ERROR(LC_SVN_ID,
+                          LV_PROC_NAME,
+                          LV_COMMENT,
+                          '',
+                          $$PLSQL_UNIT,
+                          $$PLSQL_LINE,
+                          SQLCODE,
+                          SQLERRM);
+      IF LV_DEBUG_LVL > 0 THEN
         RAISE;
       END IF;
-  END get_current_release;
+  END GET_CURRENT_RELEASE;
 
-  FUNCTION get_current_revision RETURN VARCHAR2 IS
+  FUNCTION GET_CURRENT_REVISION RETURN VARCHAR2 IS
   BEGIN
-    lv_proc_name := 'get_current_revision';
-    RETURN(current_revision);
+    LV_PROC_NAME := 'get_current_revision';
+    RETURN(CURRENT_REVISION);
   EXCEPTION
     WHEN OTHERS THEN
-      audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, '', $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
-      IF lv_debug_lvl > 0 THEN
+      AUDIT_PKG.LOG_ERROR(LC_SVN_ID,
+                          LV_PROC_NAME,
+                          LV_COMMENT,
+                          '',
+                          $$PLSQL_UNIT,
+                          $$PLSQL_LINE,
+                          SQLCODE,
+                          SQLERRM);
+      IF LV_DEBUG_LVL > 0 THEN
         RAISE;
       END IF;
-  END get_current_revision;
+  END GET_CURRENT_REVISION;
 
-  FUNCTION is_partitioned_db RETURN BOOLEAN IS
-    l_value VARCHAR2(10);
+  FUNCTION IS_PARTITIONED_DB RETURN BOOLEAN IS
+    L_VALUE VARCHAR2(10);
   BEGIN
-    lv_proc_name := 'is_partitioned_db';
-    SELECT VALUE INTO l_value FROM v$option WHERE parameter = 'Partitioning';
-    IF l_value = 'FALSE' THEN
+    LV_PROC_NAME := 'is_partitioned_db';
+    SELECT VALUE
+      INTO L_VALUE
+      FROM V$OPTION
+     WHERE PARAMETER = 'Partitioning';
+    IF L_VALUE = 'FALSE' THEN
       RETURN FALSE;
     ELSE
       RETURN TRUE;
     END IF;
   EXCEPTION
     WHEN OTHERS THEN
-      audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, '', $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
-      IF lv_debug_lvl > 0 THEN
+      AUDIT_PKG.LOG_ERROR(LC_SVN_ID,
+                          LV_PROC_NAME,
+                          LV_COMMENT,
+                          '',
+                          $$PLSQL_UNIT,
+                          $$PLSQL_LINE,
+                          SQLCODE,
+                          SQLERRM);
+      IF LV_DEBUG_LVL > 0 THEN
         RAISE;
       END IF;
       RETURN FALSE;
-  END is_partitioned_db;
+  END IS_PARTITIONED_DB;
 
-  PROCEDURE log_deploy_info(p_name VARCHAR2, p_svn_id VARCHAR2) IS
+  PROCEDURE LOG_DEPLOY_INFO(P_NAME VARCHAR2, P_SVN_ID VARCHAR2) IS
   BEGIN
-    lv_proc_name := 'log_deploy_info';
-    audit_pkg.log_pkg_init(p_name, p_svn_id);
+    LV_PROC_NAME := 'log_deploy_info';
+    AUDIT_PKG.LOG_PKG_INIT(P_NAME, P_SVN_ID);
   EXCEPTION
     WHEN OTHERS THEN
-      audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, '', $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
-      IF lv_debug_lvl > 0 THEN
+      AUDIT_PKG.LOG_ERROR(LC_SVN_ID,
+                          LV_PROC_NAME,
+                          LV_COMMENT,
+                          '',
+                          $$PLSQL_UNIT,
+                          $$PLSQL_LINE,
+                          SQLCODE,
+                          SQLERRM);
+      IF LV_DEBUG_LVL > 0 THEN
         RAISE;
       END IF;
-  END log_deploy_info;
+  END LOG_DEPLOY_INFO;
 
-  PROCEDURE pop_cust_schema_tab IS
-    n BINARY_INTEGER := 0;
+  PROCEDURE POP_CUST_SCHEMA_TAB IS
+    N BINARY_INTEGER := 0;
   BEGIN
-    lv_proc_name := 'pop_cust_schema_tab';
-    lv_comment   := 'if the PL/SQL table has no records, initialize it';
-    IF cust_schema_tab.count = 0 THEN
-      FOR cust_schema_rec IN (SELECT owner
-                                FROM all_objects
-                               WHERE object_type = 'TABLE' AND object_name = cust_sch_indicator_tab
-                               ORDER BY 1)
-      LOOP
-        n := n + 1;
-        cust_schema_tab(n) := cust_schema_rec.owner;
+    LV_PROC_NAME := 'pop_cust_schema_tab';
+    LV_COMMENT   := 'if the PL/SQL table has no records, initialize it';
+    IF CUST_SCHEMA_TAB.COUNT = 0 THEN
+      FOR CUST_SCHEMA_REC IN (SELECT OWNER
+                                FROM ALL_OBJECTS
+                               WHERE OBJECT_TYPE = 'TABLE'
+                                 AND OBJECT_NAME = CUST_SCH_INDICATOR_TAB
+                               ORDER BY 1) LOOP
+        N := N + 1;
+        CUST_SCHEMA_TAB(N) := CUST_SCHEMA_REC.OWNER;
       END LOOP;
     END IF;
   EXCEPTION
     WHEN OTHERS THEN
-      audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, '', $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
-      IF lv_debug_lvl > 0 THEN
+      AUDIT_PKG.LOG_ERROR(LC_SVN_ID,
+                          LV_PROC_NAME,
+                          LV_COMMENT,
+                          '',
+                          $$PLSQL_UNIT,
+                          $$PLSQL_LINE,
+                          SQLCODE,
+                          SQLERRM);
+      IF LV_DEBUG_LVL > 0 THEN
         RAISE;
       END IF;
-  END pop_cust_schema_tab;
+  END POP_CUST_SCHEMA_TAB;
 
-  PROCEDURE list_cust_schemas IS
+  PROCEDURE LIST_CUST_SCHEMAS IS
   BEGIN
-    lv_proc_name := 'list_cust_schemas';
-    lv_comment   := 'if the PL/SQL table has no records, initialize it';
-    pop_cust_schema_tab;
-    IF cust_schema_tab.count = 0 THEN
-      dbms_output.put_line('No customer schemas found !');
+    LV_PROC_NAME := 'list_cust_schemas';
+    LV_COMMENT   := 'if the PL/SQL table has no records, initialize it';
+    POP_CUST_SCHEMA_TAB;
+    IF CUST_SCHEMA_TAB.COUNT = 0 THEN
+      DBMS_OUTPUT.PUT_LINE('No customer schemas found !');
     ELSE
-      lv_comment := 'loop over PL/SQL table printing records';
-      FOR i IN cust_schema_tab.first .. cust_schema_tab.last
-      LOOP
-        dbms_output.put_line(cust_schema_tab(i));
+      LV_COMMENT := 'loop over PL/SQL table printing records';
+      FOR I IN CUST_SCHEMA_TAB.FIRST .. CUST_SCHEMA_TAB.LAST LOOP
+        DBMS_OUTPUT.PUT_LINE(CUST_SCHEMA_TAB(I));
       END LOOP;
     END IF;
   EXCEPTION
     WHEN OTHERS THEN
-      audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, '', $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
-      IF lv_debug_lvl > 0 THEN
+      AUDIT_PKG.LOG_ERROR(LC_SVN_ID,
+                          LV_PROC_NAME,
+                          LV_COMMENT,
+                          '',
+                          $$PLSQL_UNIT,
+                          $$PLSQL_LINE,
+                          SQLCODE,
+                          SQLERRM);
+      IF LV_DEBUG_LVL > 0 THEN
         RAISE;
       END IF;
-  END list_cust_schemas;
+  END LIST_CUST_SCHEMAS;
 
   /*  FUNCTION is_cust_facing_db RETURN BOOLEAN IS
     BEGIN
@@ -355,42 +428,50 @@ CREATE OR REPLACE PACKAGE BODY deploy_utils
     END synonyms_grants;
   */
   -- Example for p_update_sql: 'UPDATE /*+ ROWID (dda) */ order_items_ SET unit_amount_new = unit_amount WHERE rowid BETWEEN :start_id AND :end_id and unit_amount_new IS NULL';
-  PROCEDURE update_rows(p_table_owner VARCHAR,
-                        p_table_name  VARCHAR,
-                        p_update_sql  VARCHAR,
-                        p_chunk_size  PLS_INTEGER DEFAULT 5000) IS
-    l_chunk_id    NUMBER;
-    l_start_rowid ROWID;
-    l_end_rowid   ROWID;
-    l_any_rows    BOOLEAN;
-    l_row_count   NUMBER;
+  PROCEDURE UPDATE_ROWS(P_TABLE_OWNER VARCHAR,
+                        P_TABLE_NAME  VARCHAR,
+                        P_UPDATE_SQL  VARCHAR,
+                        P_CHUNK_SIZE  PLS_INTEGER DEFAULT 5000) IS
+    L_CHUNK_ID    NUMBER;
+    L_START_ROWID ROWID;
+    L_END_ROWID   ROWID;
+    L_ANY_ROWS    BOOLEAN;
+    L_ROW_COUNT   NUMBER;
   BEGIN
-    lv_proc_name := 'update_rows';
-    lv_comment   := 'Report runtime parameters';
-    dbms_application_info.set_module(lv_proc_name, p_table_name);
-    dbms_application_info.set_client_info('Starting up');
-    lv_comment := 'Check for an existing task';
+    LV_PROC_NAME := 'update_rows';
+    LV_COMMENT   := 'Report runtime parameters';
+    DBMS_APPLICATION_INFO.SET_MODULE(LV_PROC_NAME, P_TABLE_NAME);
+    DBMS_APPLICATION_INFO.SET_CLIENT_INFO('Starting up');
+    LV_COMMENT := 'Check for an existing task';
     SELECT COUNT(*)
-      INTO l_row_count
-      FROM sys.dba_parallel_execute_tasks
-     WHERE task_name = p_table_name;
-    IF (l_row_count > 0) THEN
-      lv_comment := 'Drop the existing task';
+      INTO L_ROW_COUNT
+      FROM SYS.DBA_PARALLEL_EXECUTE_TASKS
+     WHERE TASK_NAME = P_TABLE_NAME;
+    IF (L_ROW_COUNT > 0) THEN
+      LV_COMMENT := 'Drop the existing task';
       BEGIN
-        dbms_parallel_execute.drop_task(p_table_name);
+        DBMS_PARALLEL_EXECUTE.DROP_TASK(P_TABLE_NAME);
       EXCEPTION
         WHEN OTHERS THEN
           NULL;
       END;
     END IF;
     -- Create the Objects, task, and chunk by ROWID
-    dbms_parallel_execute.create_task(p_table_name);
-    dbms_parallel_execute.create_chunks_by_rowid(p_table_name, p_table_owner, p_table_name, TRUE, p_chunk_size);
+    DBMS_PARALLEL_EXECUTE.CREATE_TASK(P_TABLE_NAME);
+    DBMS_PARALLEL_EXECUTE.CREATE_CHUNKS_BY_ROWID(P_TABLE_NAME,
+                                                 P_TABLE_OWNER,
+                                                 P_TABLE_NAME,
+                                                 TRUE,
+                                                 P_CHUNK_SIZE);
     -- Process each chunk and commit.
     LOOP
       -- Get a chunk to process; if there is nothing to process, then exit the loop;
-      dbms_parallel_execute.get_rowid_chunk(p_table_name, l_chunk_id, l_start_rowid, l_end_rowid, l_any_rows);
-      IF (l_any_rows = FALSE) THEN
+      DBMS_PARALLEL_EXECUTE.GET_ROWID_CHUNK(P_TABLE_NAME,
+                                            L_CHUNK_ID,
+                                            L_START_ROWID,
+                                            L_END_ROWID,
+                                            L_ANY_ROWS);
+      IF (L_ANY_ROWS = FALSE) THEN
         EXIT;
       END IF;
       -- The chunk is specified by start_id and end_id.
@@ -402,529 +483,770 @@ CREATE OR REPLACE PACKAGE BODY deploy_utils
       -- into the chunk table and then continue to process the next chunk.
       --
       BEGIN
-        EXECUTE IMMEDIATE p_update_sql
-          USING l_start_rowid, l_end_rowid;
-        dbms_parallel_execute.set_chunk_status(p_table_name, l_chunk_id, dbms_parallel_execute.processed);
+        EXECUTE IMMEDIATE P_UPDATE_SQL
+          USING L_START_ROWID, L_END_ROWID;
+        DBMS_PARALLEL_EXECUTE.SET_CHUNK_STATUS(P_TABLE_NAME,
+                                               L_CHUNK_ID,
+                                               DBMS_PARALLEL_EXECUTE.PROCESSED);
         COMMIT;
       EXCEPTION
         WHEN OTHERS THEN
-          dbms_parallel_execute.set_chunk_status(p_table_name, l_chunk_id, dbms_parallel_execute.processed_with_error, SQLCODE, SQLERRM);
+          DBMS_PARALLEL_EXECUTE.SET_CHUNK_STATUS(P_TABLE_NAME,
+                                                 L_CHUNK_ID,
+                                                 DBMS_PARALLEL_EXECUTE.PROCESSED_WITH_ERROR,
+                                                 SQLCODE,
+                                                 SQLERRM);
       END;
     END LOOP;
   EXCEPTION
     WHEN OTHERS THEN
-      audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, '', $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
-      IF lv_debug_lvl > 0 THEN
+      AUDIT_PKG.LOG_ERROR(LC_SVN_ID,
+                          LV_PROC_NAME,
+                          LV_COMMENT,
+                          '',
+                          $$PLSQL_UNIT,
+                          $$PLSQL_LINE,
+                          SQLCODE,
+                          SQLERRM);
+      IF LV_DEBUG_LVL > 0 THEN
         RAISE;
       END IF;
-  END update_rows;
+  END UPDATE_ROWS;
 
-  PROCEDURE deploy_new_schema(p_ticket VARCHAR, p_schema VARCHAR, p_comment VARCHAR DEFAULT NULL) IS
-    v_exists PLS_INTEGER;
+  PROCEDURE DEPLOY_NEW_SCHEMA(P_TICKET  VARCHAR,
+                              P_SCHEMA  VARCHAR,
+                              P_COMMENT VARCHAR DEFAULT NULL) IS
+    V_EXISTS PLS_INTEGER;
   BEGIN
-    lv_proc_name := 'deploy_new_schema';
-    lv_comment   := 'Checking if it already exists';
-    SELECT COUNT(*) INTO v_exists FROM all_users WHERE username = upper(p_schema);
-    IF (v_exists = 0) THEN
-      lv_comment := 'Creating';
-      EXECUTE IMMEDIATE 'CREATE USER ' || p_schema ||
+    LV_PROC_NAME := 'deploy_new_schema';
+    LV_COMMENT   := 'Checking if it already exists';
+    SELECT COUNT(*)
+      INTO V_EXISTS
+      FROM ALL_USERS
+     WHERE USERNAME = UPPER(P_SCHEMA);
+    IF (V_EXISTS = 0) THEN
+      LV_COMMENT := 'Creating';
+      EXECUTE IMMEDIATE 'CREATE USER ' || P_SCHEMA ||
                         ' IDENTIFIED BY "D(FB2346----32DF" DEFAULT TABLESPACE DATA1 QUOTA UNLIMITED ON DATA1 ENABLE EDITIONS ACCOUNT LOCK';
-      lv_comment := 'Logging change';
-      audit_pkg.log_ddl_change(NULL, p_schema, 'SCHEMA', NULL, p_ticket, NULL, p_comment, lc_svn_id);
+      LV_COMMENT := 'Logging change';
+      AUDIT_PKG.LOG_DDL_CHANGE(NULL,
+                               P_SCHEMA,
+                               'SCHEMA',
+                               NULL,
+                               P_TICKET,
+                               NULL,
+                               P_COMMENT,
+                               LC_SVN_ID);
       BEGIN
-        EXECUTE IMMEDIATE 'GRANT RESOURCE TO ' || p_schema;
+        EXECUTE IMMEDIATE 'GRANT RESOURCE TO ' || P_SCHEMA;
       EXCEPTION
         WHEN OTHERS THEN
-          audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, p_ticket || ' ' ||
-                                       p_schema, $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
+          AUDIT_PKG.LOG_ERROR(LC_SVN_ID,
+                              LV_PROC_NAME,
+                              LV_COMMENT,
+                              P_TICKET || ' ' || P_SCHEMA,
+                              $$PLSQL_UNIT,
+                              $$PLSQL_LINE,
+                              SQLCODE,
+                              SQLERRM);
       END;
       BEGIN
-        EXECUTE IMMEDIATE 'REVOKE CONNECT FROM ' || p_schema;
+        EXECUTE IMMEDIATE 'REVOKE CONNECT FROM ' || P_SCHEMA;
       EXCEPTION
         WHEN OTHERS THEN
-          audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, p_ticket, $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
+          AUDIT_PKG.LOG_ERROR(LC_SVN_ID,
+                              LV_PROC_NAME,
+                              LV_COMMENT,
+                              P_TICKET,
+                              $$PLSQL_UNIT,
+                              $$PLSQL_LINE,
+                              SQLCODE,
+                              SQLERRM);
       END;
-      IF lv_debug_lvl > 5 THEN
-        dbms_output.put_line('INFO: Schema ' || p_schema || ' created for ' || p_ticket);
+      IF LV_DEBUG_LVL > 5 THEN
+        DBMS_OUTPUT.PUT_LINE('INFO: Schema ' || P_SCHEMA ||
+                             ' created for ' || P_TICKET);
       END IF;
     END IF;
   EXCEPTION
     WHEN OTHERS THEN
-      audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, p_ticket, $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
-      IF lv_debug_lvl > 0 THEN
+      AUDIT_PKG.LOG_ERROR(LC_SVN_ID,
+                          LV_PROC_NAME,
+                          LV_COMMENT,
+                          P_TICKET,
+                          $$PLSQL_UNIT,
+                          $$PLSQL_LINE,
+                          SQLCODE,
+                          SQLERRM);
+      IF LV_DEBUG_LVL > 0 THEN
         RAISE;
       END IF;
-  END deploy_new_schema;
+  END DEPLOY_NEW_SCHEMA;
 
-  PROCEDURE deploy_new_table(p_ticket          VARCHAR,
-                             p_table_owner     VARCHAR,
-                             p_table_name      VARCHAR,
-                             p_sql             VARCHAR,
-                             p_partitioned_sql VARCHAR DEFAULT NULL,
-                             p_comment         VARCHAR DEFAULT NULL) IS
-    v_exists PLS_INTEGER;
+  PROCEDURE DEPLOY_NEW_TABLE(P_TICKET          VARCHAR,
+                             P_TABLE_OWNER     VARCHAR,
+                             P_TABLE_NAME      VARCHAR,
+                             P_SQL             VARCHAR,
+                             P_PARTITIONED_SQL VARCHAR DEFAULT NULL,
+                             P_COMMENT         VARCHAR DEFAULT NULL) IS
+    V_EXISTS PLS_INTEGER;
   BEGIN
-    lv_proc_name := 'deploy_new_table';
-    lv_comment   := 'Checking if it already exists';
+    LV_PROC_NAME := 'deploy_new_table';
+    LV_COMMENT   := 'Checking if it already exists';
     SELECT COUNT(*)
-      INTO v_exists
-      FROM all_tables
-     WHERE owner = upper(p_table_owner) AND table_name = upper(p_table_name);
-    IF (v_exists = 0) THEN
-      lv_comment := 'Creating table';
-      IF (p_partitioned_sql IS NOT NULL)
-         AND is_partitioned_db THEN
-        EXECUTE IMMEDIATE p_partitioned_sql;
-        lv_comment := 'Logging create partitioned table';
-        audit_pkg.log_ddl_change(p_table_owner, p_table_name, 'TABLE', p_table_owner, p_ticket, p_partitioned_sql, p_comment, lc_svn_id);
+      INTO V_EXISTS
+      FROM ALL_TABLES
+     WHERE OWNER = UPPER(P_TABLE_OWNER)
+       AND TABLE_NAME = UPPER(P_TABLE_NAME);
+    IF (V_EXISTS = 0) THEN
+      LV_COMMENT := 'Creating table';
+      IF (P_PARTITIONED_SQL IS NOT NULL) AND IS_PARTITIONED_DB THEN
+        EXECUTE IMMEDIATE P_PARTITIONED_SQL;
+        LV_COMMENT := 'Logging create partitioned table';
+        AUDIT_PKG.LOG_DDL_CHANGE(P_TABLE_OWNER,
+                                 P_TABLE_NAME,
+                                 'TABLE',
+                                 P_TABLE_OWNER,
+                                 P_TICKET,
+                                 P_PARTITIONED_SQL,
+                                 P_COMMENT,
+                                 LC_SVN_ID);
       ELSE
-        EXECUTE IMMEDIATE p_sql;
-        lv_comment := 'Logging create table';
-        audit_pkg.log_ddl_change(p_table_owner, p_table_name, 'TABLE', p_table_owner, p_ticket, p_sql, p_comment, lc_svn_id);
+        EXECUTE IMMEDIATE P_SQL;
+        LV_COMMENT := 'Logging create table';
+        AUDIT_PKG.LOG_DDL_CHANGE(P_TABLE_OWNER,
+                                 P_TABLE_NAME,
+                                 'TABLE',
+                                 P_TABLE_OWNER,
+                                 P_TICKET,
+                                 P_SQL,
+                                 P_COMMENT,
+                                 LC_SVN_ID);
       END IF;
-      IF (p_comment IS NOT NULL) THEN
-        lv_comment := 'Adding comment:' || p_comment;
-        EXECUTE IMMEDIATE 'comment on table ' || p_table_owner || '.' || p_table_name || ' is ''' ||
-                          p_comment || '''';
+      IF (P_COMMENT IS NOT NULL) THEN
+        LV_COMMENT := 'Adding comment:' || P_COMMENT;
+        EXECUTE IMMEDIATE 'comment on table ' || P_TABLE_OWNER || '.' ||
+                          P_TABLE_NAME || ' is ''' || P_COMMENT || '''';
       END IF;
-      IF lv_debug_lvl > 5 THEN
-        dbms_output.put_line('INFO: Table ' || p_table_owner || '.' || p_table_name ||
-                             ' created for ' || p_ticket);
-      END IF;
-    END IF;
-  EXCEPTION
-    WHEN OTHERS THEN
-      audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, p_ticket || ' ' ||
-                                   p_table_owner || ' ' ||
-                                   p_table_name, $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
-      IF lv_debug_lvl > 0 THEN
-        RAISE;
-      END IF;
-  END deploy_new_table;
-
-  PROCEDURE deploy_new_column(p_ticket      VARCHAR,
-                              p_table_owner VARCHAR,
-                              p_table_name  VARCHAR,
-                              p_col_name    VARCHAR,
-                              p_sql         VARCHAR,
-                              p_comment     VARCHAR DEFAULT NULL) IS
-    v_exists PLS_INTEGER;
-  BEGIN
-    lv_proc_name := 'deploy_new_column';
-    lv_comment   := 'Checking if it already exists';
-    SELECT COUNT(*)
-      INTO v_exists
-      FROM all_tab_cols
-     WHERE owner = upper(p_table_owner) AND table_name = upper(p_table_name) AND
-           column_name = upper(p_col_name);
-    IF (v_exists = 0) THEN
-      lv_comment := 'Creating';
-      EXECUTE IMMEDIATE p_sql;
-      lv_comment := 'Logging change';
-      audit_pkg.log_ddl_change(p_table_owner, p_col_name, 'COLUMN', p_table_name, p_ticket, p_sql, p_comment, lc_svn_id);
-      IF (p_comment IS NOT NULL) THEN
-        lv_comment := 'Adding comment';
-        EXECUTE IMMEDIATE 'comment on column ' || p_table_owner || '.' || p_table_name || '.' ||
-                          p_col_name || ' is ''' || p_comment || '''';
-      END IF;
-      IF lv_debug_lvl > 5 THEN
-        dbms_output.put_line('INFO: Column ' || p_col_name || ' added to table ' || p_table_owner || '.' ||
-                             p_table_name || ' for ' || p_ticket);
+      IF LV_DEBUG_LVL > 5 THEN
+        DBMS_OUTPUT.PUT_LINE('INFO: Table ' || P_TABLE_OWNER || '.' ||
+                             P_TABLE_NAME || ' created for ' || P_TICKET);
       END IF;
     END IF;
   EXCEPTION
     WHEN OTHERS THEN
-      audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, p_ticket || ' ' ||
-                                   p_table_owner || ' ' ||
-                                   p_table_name || ' ' ||
-                                   p_col_name, $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
-      IF lv_debug_lvl > 0 THEN
+      AUDIT_PKG.LOG_ERROR(LC_SVN_ID,
+                          LV_PROC_NAME,
+                          LV_COMMENT,
+                          P_TICKET || ' ' || P_TABLE_OWNER || ' ' ||
+                          P_TABLE_NAME,
+                          $$PLSQL_UNIT,
+                          $$PLSQL_LINE,
+                          SQLCODE,
+                          SQLERRM);
+      IF LV_DEBUG_LVL > 0 THEN
         RAISE;
       END IF;
-  END deploy_new_column;
+  END DEPLOY_NEW_TABLE;
 
-  PROCEDURE deploy_new_index(p_ticket          VARCHAR,
-                             p_table_owner     VARCHAR,
-                             p_table_name      VARCHAR,
-                             p_index_name      VARCHAR,
-                             p_sql             VARCHAR,
-                             p_partitioned_sql VARCHAR DEFAULT NULL,
-                             p_comment         VARCHAR DEFAULT NULL) IS
-    v_exists PLS_INTEGER;
+  PROCEDURE DEPLOY_NEW_COLUMN(P_TICKET      VARCHAR,
+                              P_TABLE_OWNER VARCHAR,
+                              P_TABLE_NAME  VARCHAR,
+                              P_COL_NAME    VARCHAR,
+                              P_SQL         VARCHAR,
+                              P_COMMENT     VARCHAR DEFAULT NULL) IS
+    V_EXISTS PLS_INTEGER;
   BEGIN
-    lv_proc_name := 'deploy_new_index';
-    lv_comment   := 'Checking if it already exists';
+    LV_PROC_NAME := 'deploy_new_column';
+    LV_COMMENT   := 'Checking if it already exists';
     SELECT COUNT(*)
-      INTO v_exists
-      FROM all_indexes
-     WHERE owner = upper(p_table_owner) AND table_name = upper(p_table_name) AND
-           index_name = upper(p_index_name);
-    IF (v_exists = 0) THEN
-      lv_comment := 'Creating';
-      IF (p_partitioned_sql IS NOT NULL)
-         AND is_partitioned_db THEN
-        EXECUTE IMMEDIATE p_partitioned_sql;
-        lv_comment := 'Logging create partitioned index';
-        audit_pkg.log_ddl_change(p_table_owner, p_index_name, 'INDEX', p_table_name, p_ticket, p_partitioned_sql, p_comment, lc_svn_id);
+      INTO V_EXISTS
+      FROM ALL_TAB_COLS
+     WHERE OWNER = UPPER(P_TABLE_OWNER)
+       AND TABLE_NAME = UPPER(P_TABLE_NAME)
+       AND COLUMN_NAME = UPPER(P_COL_NAME);
+    IF (V_EXISTS = 0) THEN
+      LV_COMMENT := 'Creating';
+      EXECUTE IMMEDIATE P_SQL;
+      LV_COMMENT := 'Logging change';
+      AUDIT_PKG.LOG_DDL_CHANGE(P_TABLE_OWNER,
+                               P_COL_NAME,
+                               'COLUMN',
+                               P_TABLE_NAME,
+                               P_TICKET,
+                               P_SQL,
+                               P_COMMENT,
+                               LC_SVN_ID);
+      IF (P_COMMENT IS NOT NULL) THEN
+        LV_COMMENT := 'Adding comment';
+        EXECUTE IMMEDIATE 'comment on column ' || P_TABLE_OWNER || '.' ||
+                          P_TABLE_NAME || '.' || P_COL_NAME || ' is ''' ||
+                          P_COMMENT || '''';
+      END IF;
+      IF LV_DEBUG_LVL > 5 THEN
+        DBMS_OUTPUT.PUT_LINE('INFO: Column ' || P_COL_NAME ||
+                             ' added to table ' || P_TABLE_OWNER || '.' ||
+                             P_TABLE_NAME || ' for ' || P_TICKET);
+      END IF;
+    END IF;
+  EXCEPTION
+    WHEN OTHERS THEN
+      AUDIT_PKG.LOG_ERROR(LC_SVN_ID,
+                          LV_PROC_NAME,
+                          LV_COMMENT,
+                          P_TICKET || ' ' || P_TABLE_OWNER || ' ' ||
+                          P_TABLE_NAME || ' ' || P_COL_NAME,
+                          $$PLSQL_UNIT,
+                          $$PLSQL_LINE,
+                          SQLCODE,
+                          SQLERRM);
+      IF LV_DEBUG_LVL > 0 THEN
+        RAISE;
+      END IF;
+  END DEPLOY_NEW_COLUMN;
+
+  PROCEDURE DEPLOY_NEW_INDEX(P_TICKET          VARCHAR,
+                             P_TABLE_OWNER     VARCHAR,
+                             P_TABLE_NAME      VARCHAR,
+                             P_INDEX_NAME      VARCHAR,
+                             P_SQL             VARCHAR,
+                             P_PARTITIONED_SQL VARCHAR DEFAULT NULL,
+                             P_COMMENT         VARCHAR DEFAULT NULL) IS
+    V_EXISTS PLS_INTEGER;
+  BEGIN
+    LV_PROC_NAME := 'deploy_new_index';
+    LV_COMMENT   := 'Checking if it already exists';
+    SELECT COUNT(*)
+      INTO V_EXISTS
+      FROM ALL_INDEXES
+     WHERE OWNER = UPPER(P_TABLE_OWNER)
+       AND TABLE_NAME = UPPER(P_TABLE_NAME)
+       AND INDEX_NAME = UPPER(P_INDEX_NAME);
+    IF (V_EXISTS = 0) THEN
+      LV_COMMENT := 'Creating';
+      IF (P_PARTITIONED_SQL IS NOT NULL) AND IS_PARTITIONED_DB THEN
+        EXECUTE IMMEDIATE P_PARTITIONED_SQL;
+        LV_COMMENT := 'Logging create partitioned index';
+        AUDIT_PKG.LOG_DDL_CHANGE(P_TABLE_OWNER,
+                                 P_INDEX_NAME,
+                                 'INDEX',
+                                 P_TABLE_NAME,
+                                 P_TICKET,
+                                 P_PARTITIONED_SQL,
+                                 P_COMMENT,
+                                 LC_SVN_ID);
       ELSE
-        EXECUTE IMMEDIATE p_sql;
-        lv_comment := 'Logging create index';
-        audit_pkg.log_ddl_change(p_table_owner, p_index_name, 'INDEX', p_table_name, p_ticket, p_sql, p_comment, lc_svn_id);
+        EXECUTE IMMEDIATE P_SQL;
+        LV_COMMENT := 'Logging create index';
+        AUDIT_PKG.LOG_DDL_CHANGE(P_TABLE_OWNER,
+                                 P_INDEX_NAME,
+                                 'INDEX',
+                                 P_TABLE_NAME,
+                                 P_TICKET,
+                                 P_SQL,
+                                 P_COMMENT,
+                                 LC_SVN_ID);
       END IF;
-      IF lv_debug_lvl > 5 THEN
-        dbms_output.put_line('INFO: Index ' || p_index_name || ' added to table ' || p_table_owner || '.' ||
-                             p_table_name || ' for ' || p_ticket);
+      IF LV_DEBUG_LVL > 5 THEN
+        DBMS_OUTPUT.PUT_LINE('INFO: Index ' || P_INDEX_NAME ||
+                             ' added to table ' || P_TABLE_OWNER || '.' ||
+                             P_TABLE_NAME || ' for ' || P_TICKET);
       END IF;
     END IF;
   EXCEPTION
     WHEN OTHERS THEN
-      audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, p_ticket || ' ' ||
-                                   p_table_owner || ' ' ||
-                                   p_table_name || ' ' ||
-                                   p_index_name, $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
-      IF lv_debug_lvl > 0 THEN
+      AUDIT_PKG.LOG_ERROR(LC_SVN_ID,
+                          LV_PROC_NAME,
+                          LV_COMMENT,
+                          P_TICKET || ' ' || P_TABLE_OWNER || ' ' ||
+                          P_TABLE_NAME || ' ' || P_INDEX_NAME,
+                          $$PLSQL_UNIT,
+                          $$PLSQL_LINE,
+                          SQLCODE,
+                          SQLERRM);
+      IF LV_DEBUG_LVL > 0 THEN
         RAISE;
       END IF;
-  END deploy_new_index;
+  END DEPLOY_NEW_INDEX;
 
-  PROCEDURE deploy_new_sequence(p_ticket   VARCHAR,
-                                p_owner    VARCHAR,
-                                p_seq_name VARCHAR,
-                                p_sql      VARCHAR DEFAULT NULL,
-                                p_comment  VARCHAR DEFAULT NULL) IS
-    v_exists PLS_INTEGER;
-    v_sql    VARCHAR2(200);
+  PROCEDURE DEPLOY_NEW_SEQUENCE(P_TICKET   VARCHAR,
+                                P_OWNER    VARCHAR,
+                                P_SEQ_NAME VARCHAR,
+                                P_SQL      VARCHAR DEFAULT NULL,
+                                P_COMMENT  VARCHAR DEFAULT NULL) IS
+    V_EXISTS PLS_INTEGER;
+    V_SQL    VARCHAR2(200);
   BEGIN
-    lv_proc_name := 'deploy_new_sequence';
-    lv_comment   := 'Checking if it already exists';
+    LV_PROC_NAME := 'deploy_new_sequence';
+    LV_COMMENT   := 'Checking if it already exists';
     SELECT COUNT(*)
-      INTO v_exists
-      FROM all_sequences
-     WHERE sequence_owner = upper(p_owner) AND sequence_name = upper(p_seq_name);
-    IF (v_exists = 0) THEN
-      lv_comment := 'Creating';
-      v_sql      := p_sql;
-      IF p_sql IS NULL THEN
-        v_sql := 'CREATE SEQUENCE ' || p_owner || '.' || p_seq_name || ' NOCACHE';
+      INTO V_EXISTS
+      FROM ALL_SEQUENCES
+     WHERE SEQUENCE_OWNER = UPPER(P_OWNER)
+       AND SEQUENCE_NAME = UPPER(P_SEQ_NAME);
+    IF (V_EXISTS = 0) THEN
+      LV_COMMENT := 'Creating';
+      V_SQL      := P_SQL;
+      IF P_SQL IS NULL THEN
+        V_SQL := 'CREATE SEQUENCE ' || P_OWNER || '.' || P_SEQ_NAME ||
+                 ' NOCACHE';
       END IF;
-      EXECUTE IMMEDIATE v_sql;
-      lv_comment := 'Logging change';
-      audit_pkg.log_ddl_change(p_owner, p_seq_name, 'SEQUENCE', NULL, p_ticket, v_sql, p_comment, lc_svn_id);
-      IF lv_debug_lvl > 5 THEN
-        dbms_output.put_line('INFO: Sequence ' || p_owner || '.' || p_seq_name || ' created for ' ||
-                             p_ticket);
+      EXECUTE IMMEDIATE V_SQL;
+      LV_COMMENT := 'Logging change';
+      AUDIT_PKG.LOG_DDL_CHANGE(P_OWNER,
+                               P_SEQ_NAME,
+                               'SEQUENCE',
+                               NULL,
+                               P_TICKET,
+                               V_SQL,
+                               P_COMMENT,
+                               LC_SVN_ID);
+      IF LV_DEBUG_LVL > 5 THEN
+        DBMS_OUTPUT.PUT_LINE('INFO: Sequence ' || P_OWNER || '.' ||
+                             P_SEQ_NAME || ' created for ' || P_TICKET);
       END IF;
     END IF;
   EXCEPTION
     WHEN OTHERS THEN
-      audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, p_ticket || ' ' || p_owner || ' ' ||
-                                   p_seq_name, $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
-      IF lv_debug_lvl > 0 THEN
+      AUDIT_PKG.LOG_ERROR(LC_SVN_ID,
+                          LV_PROC_NAME,
+                          LV_COMMENT,
+                          P_TICKET || ' ' || P_OWNER || ' ' || P_SEQ_NAME,
+                          $$PLSQL_UNIT,
+                          $$PLSQL_LINE,
+                          SQLCODE,
+                          SQLERRM);
+      IF LV_DEBUG_LVL > 0 THEN
         RAISE;
       END IF;
-  END deploy_new_sequence;
+  END DEPLOY_NEW_SEQUENCE;
 
   -- This creates a sequence in the "cust_seq_schema" schema and then makes select grants to all customer schemas
   -- Passing the create DDL is optional, but if you do, be sure to specify "cust_seq_schema" as the schema
-  PROCEDURE deploy_new_sequence_cust(p_ticket   VARCHAR,
-                                     p_seq_name VARCHAR,
-                                     p_sql      VARCHAR DEFAULT NULL,
-                                     p_comment  VARCHAR DEFAULT NULL) IS
+  PROCEDURE DEPLOY_NEW_SEQUENCE_CUST(P_TICKET   VARCHAR,
+                                     P_SEQ_NAME VARCHAR,
+                                     P_SQL      VARCHAR DEFAULT NULL,
+                                     P_COMMENT  VARCHAR DEFAULT NULL) IS
   BEGIN
-    lv_proc_name := 'deploy_new_sequence_cust';
-    lv_comment   := 'Create sequence in ' || cust_seq_schema || ' schema';
-    deploy_new_sequence(p_ticket, cust_seq_schema, p_seq_name, p_sql, p_comment);
-    lv_comment := 'Make grants to all cust schemas';
-    pop_cust_schema_tab;
-    IF cust_schema_tab.count > 0 THEN
-      lv_comment := 'Loop over PL/SQL table - granting access';
-      FOR i IN cust_schema_tab.first .. cust_schema_tab.last
-      LOOP
-        lv_comment := 'GRANT SELECT ON ' || cust_seq_schema || '.' || p_seq_name || ' TO ' ||
-                      cust_schema_tab(i);
-        EXECUTE IMMEDIATE 'GRANT SELECT ON ' || cust_seq_schema || '.' || p_seq_name || ' TO ' ||
-                          cust_schema_tab(i);
+    LV_PROC_NAME := 'deploy_new_sequence_cust';
+    LV_COMMENT   := 'Create sequence in ' || CUST_SEQ_SCHEMA || ' schema';
+    DEPLOY_NEW_SEQUENCE(P_TICKET,
+                        CUST_SEQ_SCHEMA,
+                        P_SEQ_NAME,
+                        P_SQL,
+                        P_COMMENT);
+    LV_COMMENT := 'Make grants to all cust schemas';
+    POP_CUST_SCHEMA_TAB;
+    IF CUST_SCHEMA_TAB.COUNT > 0 THEN
+      LV_COMMENT := 'Loop over PL/SQL table - granting access';
+      FOR I IN CUST_SCHEMA_TAB.FIRST .. CUST_SCHEMA_TAB.LAST LOOP
+        LV_COMMENT := 'GRANT SELECT ON ' || CUST_SEQ_SCHEMA || '.' ||
+                      P_SEQ_NAME || ' TO ' || CUST_SCHEMA_TAB(I);
+        EXECUTE IMMEDIATE 'GRANT SELECT ON ' || CUST_SEQ_SCHEMA || '.' ||
+                          P_SEQ_NAME || ' TO ' || CUST_SCHEMA_TAB(I);
       END LOOP;
     END IF;
   EXCEPTION
     WHEN OTHERS THEN
-      audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, p_ticket || ' ' ||
-                                   cust_seq_schema || ' ' ||
-                                   p_seq_name, $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
-      IF lv_debug_lvl > 0 THEN
+      AUDIT_PKG.LOG_ERROR(LC_SVN_ID,
+                          LV_PROC_NAME,
+                          LV_COMMENT,
+                          P_TICKET || ' ' || CUST_SEQ_SCHEMA || ' ' ||
+                          P_SEQ_NAME,
+                          $$PLSQL_UNIT,
+                          $$PLSQL_LINE,
+                          SQLCODE,
+                          SQLERRM);
+      IF LV_DEBUG_LVL > 0 THEN
         RAISE;
       END IF;
-  END deploy_new_sequence_cust;
+  END DEPLOY_NEW_SEQUENCE_CUST;
 
-  PROCEDURE deploy_new_constraint(p_ticket          VARCHAR,
-                                  p_table_owner     VARCHAR,
-                                  p_table_name      VARCHAR,
-                                  p_constraint_name VARCHAR,
-                                  p_sql             VARCHAR,
-                                  p_comment         VARCHAR DEFAULT NULL) IS
-    v_exists PLS_INTEGER;
+  PROCEDURE DEPLOY_NEW_CONSTRAINT(P_TICKET          VARCHAR,
+                                  P_TABLE_OWNER     VARCHAR,
+                                  P_TABLE_NAME      VARCHAR,
+                                  P_CONSTRAINT_NAME VARCHAR,
+                                  P_SQL             VARCHAR,
+                                  P_COMMENT         VARCHAR DEFAULT NULL) IS
+    V_EXISTS PLS_INTEGER;
   BEGIN
-    lv_proc_name := 'deploy_new_constraint';
-    lv_comment   := 'Checking if it already exists';
+    LV_PROC_NAME := 'deploy_new_constraint';
+    LV_COMMENT   := 'Checking if it already exists';
     SELECT COUNT(*)
-      INTO v_exists
-      FROM all_constraints
-     WHERE owner = upper(p_table_owner) AND table_name = upper(p_table_name) AND
-           constraint_name = upper(p_constraint_name);
-    IF (v_exists = 0) THEN
-      lv_comment := 'Creating';
-      EXECUTE IMMEDIATE p_sql;
-      lv_comment := 'Logging change';
-      audit_pkg.log_ddl_change(p_table_owner, p_constraint_name, 'CONSTRAINT', p_table_name, p_ticket, p_sql, p_comment, lc_svn_id);
-      IF lv_debug_lvl > 5 THEN
-        dbms_output.put_line('INFO: Constraint ' || p_constraint_name || ' added to table ' ||
-                             p_table_owner || '.' || p_table_name || ' for ' || p_ticket);
+      INTO V_EXISTS
+      FROM ALL_CONSTRAINTS
+     WHERE OWNER = UPPER(P_TABLE_OWNER)
+       AND TABLE_NAME = UPPER(P_TABLE_NAME)
+       AND CONSTRAINT_NAME = UPPER(P_CONSTRAINT_NAME);
+    IF (V_EXISTS = 0) THEN
+      LV_COMMENT := 'Creating';
+      EXECUTE IMMEDIATE P_SQL;
+      LV_COMMENT := 'Logging change';
+      AUDIT_PKG.LOG_DDL_CHANGE(P_TABLE_OWNER,
+                               P_CONSTRAINT_NAME,
+                               'CONSTRAINT',
+                               P_TABLE_NAME,
+                               P_TICKET,
+                               P_SQL,
+                               P_COMMENT,
+                               LC_SVN_ID);
+      IF LV_DEBUG_LVL > 5 THEN
+        DBMS_OUTPUT.PUT_LINE('INFO: Constraint ' || P_CONSTRAINT_NAME ||
+                             ' added to table ' || P_TABLE_OWNER || '.' ||
+                             P_TABLE_NAME || ' for ' || P_TICKET);
       END IF;
     END IF;
   EXCEPTION
     WHEN OTHERS THEN
-      audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, p_ticket || ' ' ||
-                                   p_table_owner || ' ' ||
-                                   p_table_name || ' ' ||
-                                   p_constraint_name, $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
-      IF lv_debug_lvl > 0 THEN
+      AUDIT_PKG.LOG_ERROR(LC_SVN_ID,
+                          LV_PROC_NAME,
+                          LV_COMMENT,
+                          P_TICKET || ' ' || P_TABLE_OWNER || ' ' ||
+                          P_TABLE_NAME || ' ' || P_CONSTRAINT_NAME,
+                          $$PLSQL_UNIT,
+                          $$PLSQL_LINE,
+                          SQLCODE,
+                          SQLERRM);
+      IF LV_DEBUG_LVL > 0 THEN
         RAISE;
       END IF;
-  END deploy_new_constraint;
+  END DEPLOY_NEW_CONSTRAINT;
 
-  PROCEDURE deploy_new_job(p_ticket   VARCHAR,
-                           p_owner    VARCHAR,
-                           p_job_name VARCHAR,
-                           p_sql      VARCHAR,
-                           p_comment  VARCHAR DEFAULT NULL) IS
-    v_exists PLS_INTEGER;
+  PROCEDURE DEPLOY_NEW_JOB(P_TICKET   VARCHAR,
+                           P_OWNER    VARCHAR,
+                           P_JOB_NAME VARCHAR,
+                           P_SQL      VARCHAR,
+                           P_COMMENT  VARCHAR DEFAULT NULL) IS
+    V_EXISTS PLS_INTEGER;
   BEGIN
-    lv_proc_name := 'deploy_new_job';
-    lv_comment   := 'Checking if the job already exists';
+    LV_PROC_NAME := 'deploy_new_job';
+    LV_COMMENT   := 'Checking if the job already exists';
     SELECT COUNT(*)
-      INTO v_exists
-      FROM sys.dba_scheduler_jobs
-     WHERE owner = upper(p_owner) AND job_name = upper(p_job_name);
-    IF (v_exists = 0) THEN
-      lv_comment := 'Creating job';
-      EXECUTE IMMEDIATE p_sql;
-      lv_comment := 'Logging change';
-      audit_pkg.log_ddl_change(p_owner, p_job_name, 'JOB', NULL, p_ticket, p_sql, p_comment, lc_svn_id);
-      IF lv_debug_lvl > 5 THEN
-        dbms_output.put_line('INFO: Oracle Job ' || p_owner || '.' || p_job_name ||
-                             ' created for ' || p_ticket);
+      INTO V_EXISTS
+      FROM SYS.DBA_SCHEDULER_JOBS
+     WHERE OWNER = UPPER(P_OWNER)
+       AND JOB_NAME = UPPER(P_JOB_NAME);
+    IF (V_EXISTS = 0) THEN
+      LV_COMMENT := 'Creating job';
+      EXECUTE IMMEDIATE P_SQL;
+      LV_COMMENT := 'Logging change';
+      AUDIT_PKG.LOG_DDL_CHANGE(P_OWNER,
+                               P_JOB_NAME,
+                               'JOB',
+                               NULL,
+                               P_TICKET,
+                               P_SQL,
+                               P_COMMENT,
+                               LC_SVN_ID);
+      IF LV_DEBUG_LVL > 5 THEN
+        DBMS_OUTPUT.PUT_LINE('INFO: Oracle Job ' || P_OWNER || '.' ||
+                             P_JOB_NAME || ' created for ' || P_TICKET);
       END IF;
     END IF;
   EXCEPTION
     WHEN OTHERS THEN
-      audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, p_ticket || ' ' || p_owner || ' ' ||
-                                   p_job_name, $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
-      IF lv_debug_lvl > 0 THEN
+      AUDIT_PKG.LOG_ERROR(LC_SVN_ID,
+                          LV_PROC_NAME,
+                          LV_COMMENT,
+                          P_TICKET || ' ' || P_OWNER || ' ' || P_JOB_NAME,
+                          $$PLSQL_UNIT,
+                          $$PLSQL_LINE,
+                          SQLCODE,
+                          SQLERRM);
+      IF LV_DEBUG_LVL > 0 THEN
         RAISE;
       END IF;
-  END deploy_new_job;
+  END DEPLOY_NEW_JOB;
 
-  PROCEDURE deploy_alter_column(p_ticket      VARCHAR,
-                                p_table_owner VARCHAR,
-                                p_table_name  VARCHAR,
-                                p_col_name    VARCHAR,
-                                p_sql         VARCHAR,
-                                p_comment     VARCHAR DEFAULT NULL) IS
-    v_exists PLS_INTEGER;
+  PROCEDURE DEPLOY_ALTER_COLUMN(P_TICKET      VARCHAR,
+                                P_TABLE_OWNER VARCHAR,
+                                P_TABLE_NAME  VARCHAR,
+                                P_COL_NAME    VARCHAR,
+                                P_SQL         VARCHAR,
+                                P_COMMENT     VARCHAR DEFAULT NULL) IS
+    V_EXISTS PLS_INTEGER;
   BEGIN
-    lv_proc_name := 'deploy_alter_column';
-    lv_comment   := 'Checking if it already exists';
+    LV_PROC_NAME := 'deploy_alter_column';
+    LV_COMMENT   := 'Checking if it already exists';
     SELECT COUNT(*)
-      INTO v_exists
-      FROM all_tab_cols
-     WHERE owner = upper(p_table_owner) AND table_name = upper(p_table_name) AND
-           column_name = upper(p_col_name);
-    IF (v_exists = 1) THEN
-      lv_comment := 'Altering';
-      EXECUTE IMMEDIATE p_sql;
-      lv_comment := 'Logging change';
-      audit_pkg.log_ddl_change(p_table_owner, p_col_name, 'COLUMN', p_table_name, p_ticket, p_sql, p_comment, lc_svn_id);
-      IF (p_comment IS NOT NULL) THEN
-        lv_comment := 'Adding comment';
-        EXECUTE IMMEDIATE 'comment on column ' || p_table_owner || '.' || p_table_name || '.' ||
-                          p_col_name || ' is ''' || p_comment || '''';
+      INTO V_EXISTS
+      FROM ALL_TAB_COLS
+     WHERE OWNER = UPPER(P_TABLE_OWNER)
+       AND TABLE_NAME = UPPER(P_TABLE_NAME)
+       AND COLUMN_NAME = UPPER(P_COL_NAME);
+    IF (V_EXISTS = 1) THEN
+      LV_COMMENT := 'Altering';
+      EXECUTE IMMEDIATE P_SQL;
+      LV_COMMENT := 'Logging change';
+      AUDIT_PKG.LOG_DDL_CHANGE(P_TABLE_OWNER,
+                               P_COL_NAME,
+                               'COLUMN',
+                               P_TABLE_NAME,
+                               P_TICKET,
+                               P_SQL,
+                               P_COMMENT,
+                               LC_SVN_ID);
+      IF (P_COMMENT IS NOT NULL) THEN
+        LV_COMMENT := 'Adding comment';
+        EXECUTE IMMEDIATE 'comment on column ' || P_TABLE_OWNER || '.' ||
+                          P_TABLE_NAME || '.' || P_COL_NAME || ' is ''' ||
+                          P_COMMENT || '''';
       END IF;
-      IF lv_debug_lvl > 5 THEN
-        dbms_output.put_line('INFO: Column ' || p_col_name || ' on table ' || p_table_owner || '.' ||
-                             p_table_name || ' altered for ' || p_ticket);
+      IF LV_DEBUG_LVL > 5 THEN
+        DBMS_OUTPUT.PUT_LINE('INFO: Column ' || P_COL_NAME || ' on table ' ||
+                             P_TABLE_OWNER || '.' || P_TABLE_NAME ||
+                             ' altered for ' || P_TICKET);
       END IF;
     END IF;
   EXCEPTION
     WHEN OTHERS THEN
-      audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, p_ticket || ' ' ||
-                                   p_table_owner || ' ' ||
-                                   p_table_name || ' ' ||
-                                   p_col_name, $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
-      IF lv_debug_lvl > 0 THEN
+      AUDIT_PKG.LOG_ERROR(LC_SVN_ID,
+                          LV_PROC_NAME,
+                          LV_COMMENT,
+                          P_TICKET || ' ' || P_TABLE_OWNER || ' ' ||
+                          P_TABLE_NAME || ' ' || P_COL_NAME,
+                          $$PLSQL_UNIT,
+                          $$PLSQL_LINE,
+                          SQLCODE,
+                          SQLERRM);
+      IF LV_DEBUG_LVL > 0 THEN
         RAISE;
       END IF;
-  END deploy_alter_column;
+  END DEPLOY_ALTER_COLUMN;
 
-  PROCEDURE deploy_ddl(p_ticket VARCHAR, p_sql VARCHAR, p_comment VARCHAR DEFAULT NULL) IS
+  PROCEDURE DEPLOY_DDL(P_TICKET  VARCHAR,
+                       P_SQL     VARCHAR,
+                       P_COMMENT VARCHAR DEFAULT NULL) IS
   BEGIN
-    lv_proc_name := 'deploy_ddl';
-    EXECUTE IMMEDIATE p_sql;
-    audit_pkg.log_ddl_change(NULL, NULL, NULL, NULL, p_ticket, p_sql, p_comment, lc_svn_id);
-    IF lv_debug_lvl > 5 THEN
-      dbms_output.put_line('INFO: Generic DDL ' || p_sql || ' performed for ' || p_ticket);
+    LV_PROC_NAME := 'deploy_ddl';
+    EXECUTE IMMEDIATE P_SQL;
+    AUDIT_PKG.LOG_DDL_CHANGE(NULL,
+                             NULL,
+                             NULL,
+                             NULL,
+                             P_TICKET,
+                             P_SQL,
+                             P_COMMENT,
+                             LC_SVN_ID);
+    IF LV_DEBUG_LVL > 5 THEN
+      DBMS_OUTPUT.PUT_LINE('INFO: Generic DDL ' || P_SQL ||
+                           ' performed for ' || P_TICKET);
     END IF;
   EXCEPTION
     WHEN OTHERS THEN
-      audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, p_ticket, $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
-      IF lv_debug_lvl > 0 THEN
+      AUDIT_PKG.LOG_ERROR(LC_SVN_ID,
+                          LV_PROC_NAME,
+                          LV_COMMENT,
+                          P_TICKET,
+                          $$PLSQL_UNIT,
+                          $$PLSQL_LINE,
+                          SQLCODE,
+                          SQLERRM);
+      IF LV_DEBUG_LVL > 0 THEN
         RAISE;
       END IF;
-  END deploy_ddl;
+  END DEPLOY_DDL;
 
-  PROCEDURE drop_object(p_ticket  VARCHAR,
-                        p_type    VARCHAR,
-                        p_owner   VARCHAR,
-                        p_name    VARCHAR,
-                        p_sql     VARCHAR DEFAULT NULL,
-                        p_comment VARCHAR DEFAULT NULL) IS
-    l_cnt    PLS_INTEGER;
-    l_parent VARCHAR2(100);
+  PROCEDURE DROP_OBJECT(P_TICKET  VARCHAR,
+                        P_TYPE    VARCHAR,
+                        P_OWNER   VARCHAR,
+                        P_NAME    VARCHAR,
+                        P_SQL     VARCHAR DEFAULT NULL,
+                        P_COMMENT VARCHAR DEFAULT NULL) IS
+    L_CNT    PLS_INTEGER;
+    L_PARENT VARCHAR2(100);
   BEGIN
-    lv_proc_name := 'drop_object';
-    CASE p_type
+    LV_PROC_NAME := 'drop_object';
+    CASE P_TYPE
       WHEN 'JOB' THEN
-        lv_comment := 'Checking for existance of job';
+        LV_COMMENT := 'Checking for existance of job';
         SELECT COUNT(*)
-          INTO l_cnt
-          FROM sys.dba_scheduler_jobs
-         WHERE owner = upper(p_owner) AND job_name = upper(p_name);
-        IF (l_cnt > 0) THEN
-          lv_comment := 'Dropping ' || p_name || ' job';
-          sys.dbms_scheduler.drop_job(p_owner || '.' || p_name);
-          lv_comment := 'Logging change';
-          audit_pkg.log_ddl_change(p_owner, p_name, p_type, NULL, p_ticket, NULL, 'Dropped: ' ||
-                                            p_comment, lc_svn_id);
-          IF lv_debug_lvl > 5 THEN
-            dbms_output.put_line('INFO: ' || p_type || ' ' || p_owner || '.' || p_name ||
-                                 ' dropped for ' || p_ticket);
+          INTO L_CNT
+          FROM SYS.DBA_SCHEDULER_JOBS
+         WHERE OWNER = UPPER(P_OWNER)
+           AND JOB_NAME = UPPER(P_NAME);
+        IF (L_CNT > 0) THEN
+          LV_COMMENT := 'Dropping ' || P_NAME || ' job';
+          SYS.DBMS_SCHEDULER.DROP_JOB(P_OWNER || '.' || P_NAME);
+          LV_COMMENT := 'Logging change';
+          AUDIT_PKG.LOG_DDL_CHANGE(P_OWNER,
+                                   P_NAME,
+                                   P_TYPE,
+                                   NULL,
+                                   P_TICKET,
+                                   NULL,
+                                   'Dropped: ' || P_COMMENT,
+                                   LC_SVN_ID);
+          IF LV_DEBUG_LVL > 5 THEN
+            DBMS_OUTPUT.PUT_LINE('INFO: ' || P_TYPE || ' ' || P_OWNER || '.' ||
+                                 P_NAME || ' dropped for ' || P_TICKET);
           END IF;
         END IF;
       WHEN 'CONSTRAINT' THEN
-        lv_comment := 'Checking for existance of constraint';
+        LV_COMMENT := 'Checking for existance of constraint';
         SELECT COUNT(*)
-          INTO l_cnt
-          FROM all_constraints
-         WHERE owner = upper(p_owner) AND constraint_name = upper(p_name);
-        IF (l_cnt > 0) THEN
-          SELECT table_name
-            INTO l_parent
-            FROM all_constraints
-           WHERE owner = upper(p_owner) AND constraint_name = upper(p_name);
-          lv_comment := 'Dropping ' || p_name || ' constraint';
-          EXECUTE IMMEDIATE 'alter table ' || p_owner || '.' || l_parent || ' drop constraint ' ||
-                            p_name;
-          lv_comment := 'Logging change';
-          audit_pkg.log_ddl_change(p_owner, p_name, p_type, NULL, p_ticket, NULL, 'Dropped: ' ||
-                                            p_comment, lc_svn_id);
-          IF lv_debug_lvl > 5 THEN
-            dbms_output.put_line('INFO: ' || p_type || ' ' || p_owner || '.' || p_name ||
-                                 ' dropped for ' || p_ticket);
+          INTO L_CNT
+          FROM ALL_CONSTRAINTS
+         WHERE OWNER = UPPER(P_OWNER)
+           AND CONSTRAINT_NAME = UPPER(P_NAME);
+        IF (L_CNT > 0) THEN
+          SELECT TABLE_NAME
+            INTO L_PARENT
+            FROM ALL_CONSTRAINTS
+           WHERE OWNER = UPPER(P_OWNER)
+             AND CONSTRAINT_NAME = UPPER(P_NAME);
+          LV_COMMENT := 'Dropping ' || P_NAME || ' constraint';
+          EXECUTE IMMEDIATE 'alter table ' || P_OWNER || '.' || L_PARENT ||
+                            ' drop constraint ' || P_NAME;
+          LV_COMMENT := 'Logging change';
+          AUDIT_PKG.LOG_DDL_CHANGE(P_OWNER,
+                                   P_NAME,
+                                   P_TYPE,
+                                   NULL,
+                                   P_TICKET,
+                                   NULL,
+                                   'Dropped: ' || P_COMMENT,
+                                   LC_SVN_ID);
+          IF LV_DEBUG_LVL > 5 THEN
+            DBMS_OUTPUT.PUT_LINE('INFO: ' || P_TYPE || ' ' || P_OWNER || '.' ||
+                                 P_NAME || ' dropped for ' || P_TICKET);
           END IF;
         END IF;
       WHEN 'COLUMN' THEN
-        lv_comment := 'Checking for existance of column';
+        LV_COMMENT := 'Checking for existance of column';
         SELECT COUNT(*)
-          INTO l_cnt
-          FROM all_tab_cols
-         WHERE owner = upper(p_owner) AND column_name = upper(p_name);
-        IF (l_cnt > 0) THEN
-          SELECT table_name
-            INTO l_parent
-            FROM all_tab_cols
-           WHERE owner = upper(p_owner) AND column_name = upper(p_name);
-          lv_comment := 'Dropping ' || p_name || ' constraint';
-          EXECUTE IMMEDIATE 'alter table ' || p_owner || '.' || l_parent || ' drop column ' ||
-                            p_name;
-          lv_comment := 'Logging change';
-          audit_pkg.log_ddl_change(p_owner, p_name, p_type, NULL, p_ticket, NULL, 'Dropped: ' ||
-                                            p_comment, lc_svn_id);
-          IF lv_debug_lvl > 5 THEN
-            dbms_output.put_line('INFO: ' || p_type || ' ' || p_owner || '.' || p_name ||
-                                 ' dropped for ' || p_ticket);
+          INTO L_CNT
+          FROM ALL_TAB_COLS
+         WHERE OWNER = UPPER(P_OWNER)
+           AND COLUMN_NAME = UPPER(P_NAME);
+        IF (L_CNT > 0) THEN
+          SELECT TABLE_NAME
+            INTO L_PARENT
+            FROM ALL_TAB_COLS
+           WHERE OWNER = UPPER(P_OWNER)
+             AND COLUMN_NAME = UPPER(P_NAME);
+          LV_COMMENT := 'Dropping ' || P_NAME || ' constraint';
+          EXECUTE IMMEDIATE 'alter table ' || P_OWNER || '.' || L_PARENT ||
+                            ' drop column ' || P_NAME;
+          LV_COMMENT := 'Logging change';
+          AUDIT_PKG.LOG_DDL_CHANGE(P_OWNER,
+                                   P_NAME,
+                                   P_TYPE,
+                                   NULL,
+                                   P_TICKET,
+                                   NULL,
+                                   'Dropped: ' || P_COMMENT,
+                                   LC_SVN_ID);
+          IF LV_DEBUG_LVL > 5 THEN
+            DBMS_OUTPUT.PUT_LINE('INFO: ' || P_TYPE || ' ' || P_OWNER || '.' ||
+                                 P_NAME || ' dropped for ' || P_TICKET);
           END IF;
         END IF;
       ELSE
-        lv_comment := 'Checking for existance';
+        LV_COMMENT := 'Checking for existance';
         SELECT COUNT(*)
-          INTO l_cnt
-          FROM all_objects
-         WHERE object_type = upper(p_type) AND owner = upper(p_owner) AND
-               object_name = upper(p_name);
-        IF (l_cnt > 0) THEN
-          lv_comment := 'Dropping';
-          IF (p_sql IS NULL) THEN
-            EXECUTE IMMEDIATE 'drop ' || p_type || ' ' || p_owner || '.' || p_name;
+          INTO L_CNT
+          FROM ALL_OBJECTS
+         WHERE OBJECT_TYPE = UPPER(P_TYPE)
+           AND OWNER = UPPER(P_OWNER)
+           AND OBJECT_NAME = UPPER(P_NAME);
+        IF (L_CNT > 0) THEN
+          LV_COMMENT := 'Dropping';
+          IF (P_SQL IS NULL) THEN
+            EXECUTE IMMEDIATE 'drop ' || P_TYPE || ' ' || P_OWNER || '.' ||
+                              P_NAME;
           ELSE
-            EXECUTE IMMEDIATE p_sql;
-            lv_comment := 'Logging change';
-            audit_pkg.log_ddl_change(p_owner, p_name, p_type, NULL, p_ticket, p_sql, 'Dropped: ' ||
-                                              p_comment, lc_svn_id);
+            EXECUTE IMMEDIATE P_SQL;
+            LV_COMMENT := 'Logging change';
+            AUDIT_PKG.LOG_DDL_CHANGE(P_OWNER,
+                                     P_NAME,
+                                     P_TYPE,
+                                     NULL,
+                                     P_TICKET,
+                                     P_SQL,
+                                     'Dropped: ' || P_COMMENT,
+                                     LC_SVN_ID);
           END IF;
-          IF lv_debug_lvl > 5 THEN
-            dbms_output.put_line('INFO: ' || p_type || ' ' || p_owner || '.' || p_name ||
-                                 ' dropped for ' || p_ticket);
+          IF LV_DEBUG_LVL > 5 THEN
+            DBMS_OUTPUT.PUT_LINE('INFO: ' || P_TYPE || ' ' || P_OWNER || '.' ||
+                                 P_NAME || ' dropped for ' || P_TICKET);
           END IF;
         END IF;
     END CASE;
   EXCEPTION
     WHEN OTHERS THEN
-      audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, p_ticket || ' ' || p_type || ' ' ||
-                                   p_owner || '.' || p_name, $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
-      IF lv_debug_lvl > 0 THEN
+      AUDIT_PKG.LOG_ERROR(LC_SVN_ID,
+                          LV_PROC_NAME,
+                          LV_COMMENT,
+                          P_TICKET || ' ' || P_TYPE || ' ' || P_OWNER || '.' ||
+                          P_NAME,
+                          $$PLSQL_UNIT,
+                          $$PLSQL_LINE,
+                          SQLCODE,
+                          SQLERRM);
+      IF LV_DEBUG_LVL > 0 THEN
         RAISE;
       END IF;
-  END drop_object;
+  END DROP_OBJECT;
 
-  FUNCTION backup_table_name(p_ticket VARCHAR, p_table_owner VARCHAR, p_table_name VARCHAR)
-    RETURN VARCHAR IS
-    v_name VARCHAR2(200);
-    v_size PLS_INTEGER;
+  FUNCTION BACKUP_TABLE_NAME(P_TICKET      VARCHAR,
+                             P_TABLE_OWNER VARCHAR,
+                             P_TABLE_NAME  VARCHAR) RETURN VARCHAR IS
+    V_NAME VARCHAR2(200);
+    V_SIZE PLS_INTEGER;
   BEGIN
-    lv_proc_name := 'backup_table_name';
-    lv_comment   := 'Get length of the ticket string to append';
-    v_size       := length(p_ticket);
-    lv_comment   := 'construct the name, making sure the ticket will fit in 30 chars and sub invalid chars';
-    v_name       := REPLACE(substr(p_table_owner || '_' || p_table_name, 1, 29 - v_size) || '_' ||
-                            p_ticket, '-', '_');
-    lv_comment   := 'return the first 30 chars';
-    RETURN substr(v_name, 1, 30);
+    LV_PROC_NAME := 'backup_table_name';
+    LV_COMMENT   := 'Get length of the ticket string to append';
+    V_SIZE       := LENGTH(P_TICKET);
+    LV_COMMENT   := 'construct the name, making sure the ticket will fit in 30 chars and sub invalid chars';
+    V_NAME       := REPLACE(SUBSTR(P_TABLE_OWNER || '_' || P_TABLE_NAME,
+                                   1,
+                                   29 - V_SIZE) || '_' || P_TICKET,
+                            '-',
+                            '_');
+    LV_COMMENT   := 'return the first 30 chars';
+    RETURN SUBSTR(V_NAME, 1, 30);
   EXCEPTION
     WHEN OTHERS THEN
-      audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, p_ticket || ' ' ||
-                                   p_table_owner || '.' ||
-                                   p_table_name, $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
-      IF lv_debug_lvl > 0 THEN
+      AUDIT_PKG.LOG_ERROR(LC_SVN_ID,
+                          LV_PROC_NAME,
+                          LV_COMMENT,
+                          P_TICKET || ' ' || P_TABLE_OWNER || '.' ||
+                          P_TABLE_NAME,
+                          $$PLSQL_UNIT,
+                          $$PLSQL_LINE,
+                          SQLCODE,
+                          SQLERRM);
+      IF LV_DEBUG_LVL > 0 THEN
         RAISE;
       END IF;
-  END backup_table_name;
+  END BACKUP_TABLE_NAME;
 
-  PROCEDURE backup_table_name(p_ticket VARCHAR, p_table_owner VARCHAR, p_table_name VARCHAR) IS
-    v_name VARCHAR2(200);
+  PROCEDURE BACKUP_TABLE_NAME(P_TICKET      VARCHAR,
+                              P_TABLE_OWNER VARCHAR,
+                              P_TABLE_NAME  VARCHAR) IS
+    V_NAME VARCHAR2(200);
   BEGIN
-    lv_proc_name := 'backup_table_name';
-    lv_comment   := 'call backup_table_name function';
-    v_name       := backup_table_name(p_ticket, p_table_owner, p_table_name);
-    lv_comment   := 'print result';
-    dbms_output.put_line(backup_schema || '.' || v_name);
+    LV_PROC_NAME := 'backup_table_name';
+    LV_COMMENT   := 'call backup_table_name function';
+    V_NAME       := BACKUP_TABLE_NAME(P_TICKET, P_TABLE_OWNER, P_TABLE_NAME);
+    LV_COMMENT   := 'print result';
+    DBMS_OUTPUT.PUT_LINE(BACKUP_SCHEMA || '.' || V_NAME);
   EXCEPTION
     WHEN OTHERS THEN
-      audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, p_ticket || ' ' ||
-                                   p_table_owner || '.' ||
-                                   p_table_name, $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
-      IF lv_debug_lvl > 0 THEN
+      AUDIT_PKG.LOG_ERROR(LC_SVN_ID,
+                          LV_PROC_NAME,
+                          LV_COMMENT,
+                          P_TICKET || ' ' || P_TABLE_OWNER || '.' ||
+                          P_TABLE_NAME,
+                          $$PLSQL_UNIT,
+                          $$PLSQL_LINE,
+                          SQLCODE,
+                          SQLERRM);
+      IF LV_DEBUG_LVL > 0 THEN
         RAISE;
       END IF;
-  END backup_table_name;
+  END BACKUP_TABLE_NAME;
 
   /* deploy_utils.backup_data
   This creates a backup copy of a table (or a subset of the table's rows)
@@ -941,212 +1263,247 @@ CREATE OR REPLACE PACKAGE BODY deploy_utils
   3. Create a function that accepts the same first 3 parameters and returns the name of the backup table
   4. Add expire date as comment on backup table
   */
-  PROCEDURE backup_data(p_ticket      VARCHAR,
-                        p_table_owner VARCHAR,
-                        p_table_name  VARCHAR,
-                        p_sql         VARCHAR DEFAULT NULL,
-                        p_expire_date DATE DEFAULT NULL,
-                        p_comment     VARCHAR DEFAULT NULL) IS
-    v_sql            VARCHAR2(32000);
-    v_bkp_table_name VARCHAR2(35);
-    v_expire         VARCHAR2(35);
-    v_comment        VARCHAR2(4000);
+  PROCEDURE BACKUP_DATA(P_TICKET      VARCHAR,
+                        P_TABLE_OWNER VARCHAR,
+                        P_TABLE_NAME  VARCHAR,
+                        P_SQL         VARCHAR DEFAULT NULL,
+                        P_EXPIRE_DATE DATE DEFAULT NULL,
+                        P_COMMENT     VARCHAR DEFAULT NULL) IS
+    V_SQL            VARCHAR2(32000);
+    V_BKP_TABLE_NAME VARCHAR2(35);
+    V_EXPIRE         VARCHAR2(35);
+    V_COMMENT        VARCHAR2(4000);
   
-    PROCEDURE bkp_1_table(p_ticket      VARCHAR,
-                          p_table_owner VARCHAR,
-                          p_table_name  VARCHAR,
-                          p_sql         VARCHAR DEFAULT NULL,
-                          p_comment     VARCHAR) IS
-      v_cnt            PLS_INTEGER;
-      v_sql            VARCHAR2(32000);
-      v_bkp_table_name VARCHAR2(35);
+    PROCEDURE BKP_1_TABLE(P_TICKET      VARCHAR,
+                          P_TABLE_OWNER VARCHAR,
+                          P_TABLE_NAME  VARCHAR,
+                          P_SQL         VARCHAR DEFAULT NULL,
+                          P_COMMENT     VARCHAR) IS
+      V_CNT            PLS_INTEGER;
+      V_SQL            VARCHAR2(32000);
+      V_BKP_TABLE_NAME VARCHAR2(35);
     BEGIN
-      lv_comment := 'in bkp_1_table proc';
-      IF p_sql IS NULL THEN
-        v_sql := 'select * from ' || p_table_owner || '.' || p_table_name;
+      LV_COMMENT := 'in bkp_1_table proc';
+      IF P_SQL IS NULL THEN
+        V_SQL := 'select * from ' || P_TABLE_OWNER || '.' || P_TABLE_NAME;
       ELSE
-        v_sql := REPLACE(p_sql, 'MASTER_SCHEMA', p_table_owner);
+        V_SQL := REPLACE(P_SQL, 'MASTER_SCHEMA', P_TABLE_OWNER);
       END IF;
-      lv_comment := 'chk for existance of the source table';
+      LV_COMMENT := 'chk for existance of the source table';
       SELECT COUNT(*)
-        INTO v_cnt
-        FROM all_tables
-       WHERE owner = p_table_owner AND table_name = p_table_name;
-      IF v_cnt = 1 THEN
-        lv_comment       := 'performing backup';
-        v_bkp_table_name := backup_table_name(p_ticket, p_table_owner, p_table_name);
-        lv_comment       := 'chk for existance of the backup table';
+        INTO V_CNT
+        FROM ALL_TABLES
+       WHERE OWNER = P_TABLE_OWNER
+         AND TABLE_NAME = P_TABLE_NAME;
+      IF V_CNT = 1 THEN
+        LV_COMMENT       := 'performing backup';
+        V_BKP_TABLE_NAME := BACKUP_TABLE_NAME(P_TICKET,
+                                              P_TABLE_OWNER,
+                                              P_TABLE_NAME);
+        LV_COMMENT       := 'chk for existance of the backup table';
         SELECT COUNT(*)
-          INTO v_cnt
-          FROM all_tables
-         WHERE owner = backup_schema AND table_name = v_bkp_table_name;
-        IF v_cnt = 0 THEN
-          lv_comment := 'bkp_1_table - create table ' || backup_schema || '.' || v_bkp_table_name ||
-                        ' as ' || v_sql;
-          EXECUTE IMMEDIATE 'create table ' || backup_schema || '.' || v_bkp_table_name || ' as ' ||
-                            v_sql;
-          lv_comment := 'bkp_1_table - comment on table ' || backup_schema || '.' ||
-                        v_bkp_table_name || ' IS ''' || p_comment || '''';
-          EXECUTE IMMEDIATE 'comment on table ' || backup_schema || '.' || v_bkp_table_name ||
-                            ' IS ''' || p_comment || '''';
-          lv_comment := 'logging change';
-          INSERT INTO data_audit_log
-            (log_timestamp,
-             user_name,
-             app_name,
-             tab_owner,
-             tab_name,
-             action_type,
-             dml_type,
-             log_comment)
+          INTO V_CNT
+          FROM ALL_TABLES
+         WHERE OWNER = BACKUP_SCHEMA
+           AND TABLE_NAME = V_BKP_TABLE_NAME;
+        IF V_CNT = 0 THEN
+          LV_COMMENT := 'bkp_1_table - create table ' || BACKUP_SCHEMA || '.' ||
+                        V_BKP_TABLE_NAME || ' as ' || V_SQL;
+          EXECUTE IMMEDIATE 'create table ' || BACKUP_SCHEMA || '.' ||
+                            V_BKP_TABLE_NAME || ' as ' || V_SQL;
+          LV_COMMENT := 'bkp_1_table - comment on table ' || BACKUP_SCHEMA || '.' ||
+                        V_BKP_TABLE_NAME || ' IS ''' || P_COMMENT || '''';
+          EXECUTE IMMEDIATE 'comment on table ' || BACKUP_SCHEMA || '.' ||
+                            V_BKP_TABLE_NAME || ' IS ''' || P_COMMENT || '''';
+          LV_COMMENT := 'logging change';
+          INSERT INTO DATA_AUDIT_LOG
+            (LOG_DATE,
+             USER_NAME,
+             APP_NAME,
+             TAB_OWNER,
+             TAB_NAME,
+             ACTION_TYPE,
+             DML_TYPE,
+             LOG_COMMENT)
           VALUES
-            (systimestamp,
+            (SYSDATE,
              USER,
              'deploy_utils.backup_data',
-             p_table_owner,
-             p_table_name,
+             P_TABLE_OWNER,
+             P_TABLE_NAME,
              'BACKUP',
              'CTAS',
-             p_comment);
-          lv_comment := 'Report change';
+             P_COMMENT);
+          LV_COMMENT := 'Report change';
         END IF;
-        IF lv_debug_lvl > 5 THEN
-          dbms_output.put_line('INFO: Table ' || p_table_owner || '.' || p_table_name ||
-                               ' backed up for ' || p_ticket);
+        IF LV_DEBUG_LVL > 5 THEN
+          DBMS_OUTPUT.PUT_LINE('INFO: Table ' || P_TABLE_OWNER || '.' ||
+                               P_TABLE_NAME || ' backed up for ' ||
+                               P_TICKET);
         END IF;
       END IF;
     EXCEPTION
       WHEN OTHERS THEN
-        audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, p_ticket || ' ' ||
-                                     p_table_owner || '.' ||
-                                     p_table_name, $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
-    END bkp_1_table;
+        AUDIT_PKG.LOG_ERROR(LC_SVN_ID,
+                            LV_PROC_NAME,
+                            LV_COMMENT,
+                            P_TICKET || ' ' || P_TABLE_OWNER || '.' ||
+                            P_TABLE_NAME,
+                            $$PLSQL_UNIT,
+                            $$PLSQL_LINE,
+                            SQLCODE,
+                            SQLERRM);
+    END BKP_1_TABLE;
   BEGIN
-    lv_proc_name := 'backup_data';
-    lv_comment   := 'computing expiration date';
-    IF p_expire_date IS NULL THEN
-      v_expire := to_char(SYSDATE + 30, 'DD-MON-YYYY');
+    LV_PROC_NAME := 'backup_data';
+    LV_COMMENT   := 'computing expiration date';
+    IF P_EXPIRE_DATE IS NULL THEN
+      V_EXPIRE := TO_CHAR(SYSDATE + 30, 'DD-MON-YYYY');
     ELSE
-      v_expire := to_char(p_expire_date, 'DD-MON-YYYY');
+      V_EXPIRE := TO_CHAR(P_EXPIRE_DATE, 'DD-MON-YYYY');
     END IF;
-    lv_comment := 'computing change comment';
-    v_comment  := substr(p_ticket || ' Expires: ' || v_expire || ' ' || p_comment, 1, 4000);
-    lv_comment := 'Checking if this goes to all cust schemas';
-    IF p_table_owner = 'MASTER_SCHEMA' THEN
-      lv_comment := 'if the PL/SQL table has no records, initialize it';
-      pop_cust_schema_tab;
-      lv_comment := 'loop over all the cust schemas';
-      FOR i IN cust_schema_tab.first .. cust_schema_tab.last
-      LOOP
-        bkp_1_table(p_ticket, cust_schema_tab(i), p_table_name, p_sql, v_comment);
+    LV_COMMENT := 'computing change comment';
+    V_COMMENT  := SUBSTR(P_TICKET || ' Expires: ' || V_EXPIRE || ' ' ||
+                         P_COMMENT,
+                         1,
+                         4000);
+    LV_COMMENT := 'Checking if this goes to all cust schemas';
+    IF P_TABLE_OWNER = 'MASTER_SCHEMA' THEN
+      LV_COMMENT := 'if the PL/SQL table has no records, initialize it';
+      POP_CUST_SCHEMA_TAB;
+      LV_COMMENT := 'loop over all the cust schemas';
+      FOR I IN CUST_SCHEMA_TAB.FIRST .. CUST_SCHEMA_TAB.LAST LOOP
+        BKP_1_TABLE(P_TICKET,
+                    CUST_SCHEMA_TAB(I),
+                    P_TABLE_NAME,
+                    P_SQL,
+                    V_COMMENT);
       END LOOP;
     ELSE
-      bkp_1_table(p_ticket, p_table_owner, p_table_name, p_sql, v_comment);
+      BKP_1_TABLE(P_TICKET, P_TABLE_OWNER, P_TABLE_NAME, P_SQL, V_COMMENT);
     END IF;
   EXCEPTION
     WHEN OTHERS THEN
-      audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, p_ticket || ' ' ||
-                                   p_table_owner || '.' ||
-                                   p_table_name, $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
-      IF lv_debug_lvl > 0 THEN
+      AUDIT_PKG.LOG_ERROR(LC_SVN_ID,
+                          LV_PROC_NAME,
+                          LV_COMMENT,
+                          P_TICKET || ' ' || P_TABLE_OWNER || '.' ||
+                          P_TABLE_NAME,
+                          $$PLSQL_UNIT,
+                          $$PLSQL_LINE,
+                          SQLCODE,
+                          SQLERRM);
+      IF LV_DEBUG_LVL > 0 THEN
         RAISE;
       END IF;
-  END backup_data;
+  END BACKUP_DATA;
 
   -- trim_backup_data - trims the backup data if it is past it's expire date
   -- the force option ignores the expiration date and always drops the data
-  PROCEDURE trim_backup_data(p_ticket      VARCHAR,
-                              p_table_owner VARCHAR,
-                              p_table_name  VARCHAR,
-                              force         BOOLEAN DEFAULT FALSE) IS
-    v_bkp_table_name VARCHAR2(35);
+  PROCEDURE TRIM_BACKUP_DATA(P_TICKET      VARCHAR,
+                             P_TABLE_OWNER VARCHAR,
+                             P_TABLE_NAME  VARCHAR,
+                             FORCE         BOOLEAN DEFAULT FALSE) IS
+    V_BKP_TABLE_NAME VARCHAR2(35);
   
-    PROCEDURE trim_1_table(p_ticket      VARCHAR,
-                            p_table_owner VARCHAR,
-                            p_table_name  VARCHAR,
-                            force         BOOLEAN DEFAULT FALSE) IS
-      v_cnt            PLS_INTEGER;
-      v_age            PLS_INTEGER;
-      v_bkp_table_name VARCHAR2(35);
-      v_expired        BOOLEAN := FALSE;
+    PROCEDURE TRIM_1_TABLE(P_TICKET      VARCHAR,
+                           P_TABLE_OWNER VARCHAR,
+                           P_TABLE_NAME  VARCHAR,
+                           FORCE         BOOLEAN DEFAULT FALSE) IS
+      V_CNT            PLS_INTEGER;
+      V_AGE            PLS_INTEGER;
+      V_BKP_TABLE_NAME VARCHAR2(35);
+      V_EXPIRED        BOOLEAN := FALSE;
     BEGIN
-      lv_comment := 'in trim_1_table proc';
-      lv_comment := 'chk for existance of the backup table';
+      LV_COMMENT := 'in trim_1_table proc';
+      LV_COMMENT := 'chk for existance of the backup table';
       SELECT COUNT(*)
-        INTO v_cnt
-        FROM all_tables
-       WHERE owner = backup_schema AND table_name = v_bkp_table_name;
-      IF v_cnt = 1 THEN
-        lv_comment := 'chk expiration status of the backup table';
+        INTO V_CNT
+        FROM ALL_TABLES
+       WHERE OWNER = BACKUP_SCHEMA
+         AND TABLE_NAME = V_BKP_TABLE_NAME;
+      IF V_CNT = 1 THEN
+        LV_COMMENT := 'chk expiration status of the backup table';
         -- check here
-        SELECT round(SYSDATE - nvl(MAX(created), SYSDATE))
-          INTO v_age
-          FROM all_objects
-         WHERE owner = backup_schema AND object_name = v_bkp_table_name AND object_type = 'TABLE';
-        IF v_age > 30 THEN
-          v_expired := TRUE;
+        SELECT ROUND(SYSDATE - NVL(MAX(CREATED), SYSDATE))
+          INTO V_AGE
+          FROM ALL_OBJECTS
+         WHERE OWNER = BACKUP_SCHEMA
+           AND OBJECT_NAME = V_BKP_TABLE_NAME
+           AND OBJECT_TYPE = 'TABLE';
+        IF V_AGE > 30 THEN
+          V_EXPIRED := TRUE;
         END IF;
-        IF v_expired
-           OR force THEN
-          EXECUTE IMMEDIATE 'drop table ' || backup_schema || '.' || v_bkp_table_name;
-          lv_comment := 'logging change';
-          INSERT INTO data_audit_log
-            (log_timestamp,
-             user_name,
-             app_name,
-             tab_owner,
-             tab_name,
-             action_type,
-             dml_type,
-             log_comment)
+        IF V_EXPIRED OR FORCE THEN
+          EXECUTE IMMEDIATE 'drop table ' || BACKUP_SCHEMA || '.' ||
+                            V_BKP_TABLE_NAME;
+          LV_COMMENT := 'logging change';
+          INSERT INTO DATA_AUDIT_LOG
+            (LOG_DATE,
+             USER_NAME,
+             APP_NAME,
+             TAB_OWNER,
+             TAB_NAME,
+             ACTION_TYPE,
+             DML_TYPE,
+             LOG_COMMENT)
           VALUES
-            (systimestamp,
+            (SYSDATE,
              USER,
              'deploy_utils.trim_backup_data',
-             p_table_owner,
-             p_table_name,
+             P_TABLE_OWNER,
+             P_TABLE_NAME,
              'TRIM',
              'DROP',
              '');
         END IF;
-        IF lv_debug_lvl > 5 THEN
-          dbms_output.put_line('INFO: Backup data from ' || p_table_owner || '.' || p_table_name ||
-                               ' trimd for ' || p_ticket);
+        IF LV_DEBUG_LVL > 5 THEN
+          DBMS_OUTPUT.PUT_LINE('INFO: Backup data from ' || P_TABLE_OWNER || '.' ||
+                               P_TABLE_NAME || ' trimd for ' || P_TICKET);
         END IF;
       END IF;
     EXCEPTION
       WHEN OTHERS THEN
-        audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, p_ticket || ' ' ||
-                                     p_table_owner || '.' ||
-                                     p_table_name, $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
-    END trim_1_table;
+        AUDIT_PKG.LOG_ERROR(LC_SVN_ID,
+                            LV_PROC_NAME,
+                            LV_COMMENT,
+                            P_TICKET || ' ' || P_TABLE_OWNER || '.' ||
+                            P_TABLE_NAME,
+                            $$PLSQL_UNIT,
+                            $$PLSQL_LINE,
+                            SQLCODE,
+                            SQLERRM);
+    END TRIM_1_TABLE;
   BEGIN
-    lv_proc_name := 'trim_backup_data';
-    lv_comment   := 'Checking if this goes to all cust schemas';
-    IF p_table_owner = 'MASTER_SCHEMA' THEN
-      lv_comment := 'if the PL/SQL table has no records, initialize it';
-      pop_cust_schema_tab;
-      lv_comment := 'loop over all the cust schemas';
-      FOR i IN cust_schema_tab.first .. cust_schema_tab.last
-      LOOP
-        trim_1_table(p_ticket, cust_schema_tab(i), p_table_name, force);
+    LV_PROC_NAME := 'trim_backup_data';
+    LV_COMMENT   := 'Checking if this goes to all cust schemas';
+    IF P_TABLE_OWNER = 'MASTER_SCHEMA' THEN
+      LV_COMMENT := 'if the PL/SQL table has no records, initialize it';
+      POP_CUST_SCHEMA_TAB;
+      LV_COMMENT := 'loop over all the cust schemas';
+      FOR I IN CUST_SCHEMA_TAB.FIRST .. CUST_SCHEMA_TAB.LAST LOOP
+        TRIM_1_TABLE(P_TICKET, CUST_SCHEMA_TAB(I), P_TABLE_NAME, FORCE);
       END LOOP;
     ELSE
-      trim_1_table(p_ticket, p_table_owner, p_table_name, force);
+      TRIM_1_TABLE(P_TICKET, P_TABLE_OWNER, P_TABLE_NAME, FORCE);
     END IF;
   EXCEPTION
     WHEN OTHERS THEN
-      audit_pkg.log_error(lc_svn_id, lv_proc_name, lv_comment, p_ticket || ' ' ||
-                                   p_table_owner || '.' ||
-                                   p_table_name, $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
-      IF lv_debug_lvl > 0 THEN
+      AUDIT_PKG.LOG_ERROR(LC_SVN_ID,
+                          LV_PROC_NAME,
+                          LV_COMMENT,
+                          P_TICKET || ' ' || P_TABLE_OWNER || '.' ||
+                          P_TABLE_NAME,
+                          $$PLSQL_UNIT,
+                          $$PLSQL_LINE,
+                          SQLCODE,
+                          SQLERRM);
+      IF LV_DEBUG_LVL > 0 THEN
         RAISE;
       END IF;
-  END trim_backup_data;
+  END TRIM_BACKUP_DATA;
 
 BEGIN
-  audit_pkg.log_pkg_init($$PLSQL_UNIT, lc_svn_id);
-END deploy_utils;
+  AUDIT_PKG.LOG_PKG_INIT($$PLSQL_UNIT, LC_SVN_ID);
+END DEPLOY_UTILS;
 /
-SHOW ERRORS
-

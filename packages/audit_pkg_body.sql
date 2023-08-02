@@ -1,303 +1,325 @@
-SET DEFINE OFF
-
-CREATE OR REPLACE PACKAGE BODY audit_pkg IS
+CREATE OR REPLACE PACKAGE BODY AUDIT_PKG IS
   -- File audit_pkg_body.sql
   -- Author: dheltzel
-  lc_svn_id VARCHAR2(200) := 'audit_pkg_body.sql dheltzel';
+  LC_SVN_ID VARCHAR2(200) := 'audit_pkg_body.sql dheltzel';
 
-  lv_proc_name err_log.proc_name%TYPE;
+  LV_PROC_NAME ERR_LOG.PROC_NAME%TYPE;
 
-  lv_comment err_log.source_file%TYPE := 'Starting';
+  LV_COMMENT ERR_LOG.SOURCE_FILE%TYPE := 'Starting';
 
-  PROCEDURE test_harness_log_error IS
+  PROCEDURE TEST_HARNESS_LOG_ERROR IS
   BEGIN
-    lv_proc_name := 'test_harness_log_error';
-    lv_comment   := 'No error - test only';
-    log_error(lc_svn_id, lv_proc_name, lv_comment, 'No data to log', $$PLSQL_UNIT, $$PLSQL_LINE, SQLCODE, SQLERRM);
-  END test_harness_log_error;
+    LV_PROC_NAME := 'test_harness_log_error';
+    LV_COMMENT   := 'No error - test only';
+    LOG_ERROR(LC_SVN_ID,
+              LV_PROC_NAME,
+              LV_COMMENT,
+              'No data to log',
+              $$PLSQL_UNIT,
+              $$PLSQL_LINE,
+              SQLCODE,
+              SQLERRM);
+  END TEST_HARNESS_LOG_ERROR;
 
-  PROCEDURE log_detailed_error(p_source_file err_log.source_file%TYPE,
-                               p_revision    err_log.revision%TYPE,
-                               p_rev_author  err_log.rev_author%TYPE,
-                               p_rev_date    err_log.rev_date%TYPE,
-                               p_proc_name   err_log.proc_name%TYPE,
-                               p_error_loc   err_log.error_loc%TYPE,
-                               p_error_data  err_log.error_data%TYPE,
-                               p_plsql_unit  err_log.plsql_unit%TYPE,
-                               p_plsql_line  err_log.plsql_line%TYPE,
-                               p_sqlcode     err_log.sqlcode%TYPE,
-                               p_sqlerrm     err_log.sqlerrm%TYPE) IS
+  PROCEDURE LOG_DETAILED_ERROR(P_SOURCE_FILE ERR_LOG.SOURCE_FILE%TYPE,
+                               P_REVISION    ERR_LOG.REVISION%TYPE,
+                               P_REV_AUTHOR  ERR_LOG.REV_AUTHOR%TYPE,
+                               P_REV_DATE    ERR_LOG.REV_DATE%TYPE,
+                               P_PROC_NAME   ERR_LOG.PROC_NAME%TYPE,
+                               P_ERROR_LOC   ERR_LOG.ERROR_LOC%TYPE,
+                               P_ERROR_DATA  ERR_LOG.ERROR_DATA%TYPE,
+                               P_PLSQL_UNIT  ERR_LOG.PLSQL_UNIT%TYPE,
+                               P_PLSQL_LINE  ERR_LOG.PLSQL_LINE%TYPE,
+                               P_SQLCODE     ERR_LOG.SQLCODE%TYPE,
+                               P_SQLERRM     ERR_LOG.SQLERRM%TYPE) IS
     PRAGMA AUTONOMOUS_TRANSACTION;
-    v_skip_error custom_except_handling.skip_err%TYPE;
+    V_SKIP_ERROR CUSTOM_EXCEPT_HANDLING.SKIP_ERR%TYPE;
   BEGIN
-    SELECT MAX(skip_err)
-      INTO v_skip_error
-      FROM custom_except_handling
-     WHERE err_num = p_sqlcode AND
-           (procname = p_proc_name OR procname = p_plsql_unit OR procname = 'All') AND
-           skip_err = 'Y';
-    IF (v_skip_error IS NULL) THEN
-      INSERT INTO err_log
-        (TIMESTAMP,
-         user_name,
-         error_type,
-         edition,
-         proc_name,
-         error_loc,
-         error_data,
-         source_file,
-         revision,
-         rev_author,
-         rev_date,
-         plsql_unit,
-         plsql_line,
+    SELECT MAX(SKIP_ERR)
+      INTO V_SKIP_ERROR
+      FROM CUSTOM_EXCEPT_HANDLING
+     WHERE ERR_NUM = P_SQLCODE
+       AND (PROCNAME = P_PROC_NAME OR PROCNAME = P_PLSQL_UNIT OR
+           PROCNAME = 'All')
+       AND SKIP_ERR = 'Y';
+    IF (V_SKIP_ERROR IS NULL) THEN
+      INSERT INTO ERR_LOG
+        (LOG_DATE,
+         USER_NAME,
+         ERROR_TYPE,
+         EDITION,
+         PROC_NAME,
+         ERROR_LOC,
+         ERROR_DATA,
+         SOURCE_FILE,
+         REVISION,
+         REV_AUTHOR,
+         REV_DATE,
+         PLSQL_UNIT,
+         PLSQL_LINE,
          SQLCODE,
          SQLERRM)
       VALUES
-        (systimestamp,
-         sys_context('USERENV', 'SESSION_USER'),
+        (SYSDATE,
+         SYS_CONTEXT('USERENV', 'SESSION_USER'),
          'PLSQL',
-         sys_context('USERENV', 'CURRENT_EDITION_NAME'),
-         p_proc_name,
-         p_error_loc,
-         p_error_data,
-         p_source_file,
-         p_revision,
-         p_rev_author,
-         p_rev_date,
-         p_plsql_unit,
-         p_plsql_line,
-         p_sqlcode,
-         p_sqlerrm);
+         SYS_CONTEXT('USERENV', 'CURRENT_EDITION_NAME'),
+         P_PROC_NAME,
+         P_ERROR_LOC,
+         P_ERROR_DATA,
+         P_SOURCE_FILE,
+         P_REVISION,
+         P_REV_AUTHOR,
+         P_REV_DATE,
+         P_PLSQL_UNIT,
+         P_PLSQL_LINE,
+         P_SQLCODE,
+         P_SQLERRM);
       COMMIT;
     END IF;
-  END log_detailed_error;
+  END LOG_DETAILED_ERROR;
 
-  PROCEDURE log_error(p_svn_id     VARCHAR2,
-                      p_proc_name  err_log.proc_name%TYPE,
-                      p_error_loc  err_log.error_loc%TYPE,
-                      p_error_data err_log.error_data%TYPE,
-                      p_plsql_unit err_log.plsql_unit%TYPE,
-                      p_plsql_line err_log.plsql_line%TYPE,
-                      p_sqlcode    err_log.sqlcode%TYPE,
-                      p_sqlerrm    err_log.sqlerrm%TYPE) IS
-    l_source_file err_log.source_file%TYPE;
-    l_revision    err_log.revision%TYPE;
-    l_rev_author  err_log.rev_author%TYPE;
-    l_rev_date    err_log.rev_date%TYPE;
-    l_remaining   VARCHAR2(2000);
-    l_loc         PLS_INTEGER;
+  PROCEDURE LOG_ERROR(P_SVN_ID     VARCHAR2,
+                      P_PROC_NAME  ERR_LOG.PROC_NAME%TYPE,
+                      P_ERROR_LOC  ERR_LOG.ERROR_LOC%TYPE,
+                      P_ERROR_DATA ERR_LOG.ERROR_DATA%TYPE,
+                      P_PLSQL_UNIT ERR_LOG.PLSQL_UNIT%TYPE,
+                      P_PLSQL_LINE ERR_LOG.PLSQL_LINE%TYPE,
+                      P_SQLCODE    ERR_LOG.SQLCODE%TYPE,
+                      P_SQLERRM    ERR_LOG.SQLERRM%TYPE) IS
+    L_SOURCE_FILE ERR_LOG.SOURCE_FILE%TYPE;
+    L_REVISION    ERR_LOG.REVISION%TYPE;
+    L_REV_AUTHOR  ERR_LOG.REV_AUTHOR%TYPE;
+    L_REV_DATE    ERR_LOG.REV_DATE%TYPE;
+    L_REMAINING   VARCHAR2(2000);
+    L_LOC         PLS_INTEGER;
   BEGIN
     -- Parse the p_svn_id argument into parts to store in the table
-    l_remaining := TRIM(ltrim(p_svn_id, '$Id:'));
+    L_REMAINING := TRIM(LTRIM(P_SVN_ID, '$Id:'));
     -- source_file
-    l_loc         := instr(l_remaining, ' ', 1, 1);
-    l_source_file := TRIM(substr(l_remaining, 1, l_loc));
-    l_remaining   := TRIM(substr(l_remaining, l_loc + 1));
+    L_LOC         := INSTR(L_REMAINING, ' ', 1, 1);
+    L_SOURCE_FILE := TRIM(SUBSTR(L_REMAINING, 1, L_LOC));
+    L_REMAINING   := TRIM(SUBSTR(L_REMAINING, L_LOC + 1));
     -- revision
-    l_loc       := instr(l_remaining, ' ', 1, 1);
-    l_revision  := TRIM(substr(l_remaining, 1, l_loc));
-    l_remaining := TRIM(substr(l_remaining, l_loc + 1));
+    L_LOC       := INSTR(L_REMAINING, ' ', 1, 1);
+    L_REVISION  := TRIM(SUBSTR(L_REMAINING, 1, L_LOC));
+    L_REMAINING := TRIM(SUBSTR(L_REMAINING, L_LOC + 1));
     -- l_rev_date
-    l_loc      := instr(l_remaining, ' ', 1, 2);
-    l_rev_date := TRIM(substr(l_remaining, 1, l_loc));
+    L_LOC      := INSTR(L_REMAINING, ' ', 1, 2);
+    L_REV_DATE := TRIM(SUBSTR(L_REMAINING, 1, L_LOC));
     -- rev_author
-    l_rev_author := TRIM(rtrim(substr(l_remaining, l_loc + 1), '$'));
+    L_REV_AUTHOR := TRIM(RTRIM(SUBSTR(L_REMAINING, L_LOC + 1), '$'));
     -- Call proc to log error
-    log_detailed_error(l_source_file, l_revision, l_rev_author, l_rev_date, p_proc_name, p_error_loc, p_error_data, p_plsql_unit, p_plsql_line, p_sqlcode, p_sqlerrm);
-  END log_error;
+    LOG_DETAILED_ERROR(L_SOURCE_FILE,
+                       L_REVISION,
+                       L_REV_AUTHOR,
+                       L_REV_DATE,
+                       P_PROC_NAME,
+                       P_ERROR_LOC,
+                       P_ERROR_DATA,
+                       P_PLSQL_UNIT,
+                       P_PLSQL_LINE,
+                       P_SQLCODE,
+                       P_SQLERRM);
+  END LOG_ERROR;
 
-  PROCEDURE log_action(p_app_name VARCHAR2, p_action_type VARCHAR2, p_log_comment VARCHAR2) IS
+  PROCEDURE LOG_ACTION(P_APP_NAME    VARCHAR2,
+                       P_ACTION_TYPE VARCHAR2,
+                       P_LOG_COMMENT VARCHAR2) IS
     PRAGMA AUTONOMOUS_TRANSACTION;
   BEGIN
-    INSERT INTO action_audit_log
-      (log_timestamp, user_name, edition, app_name, action_type, log_comment)
+    INSERT INTO ACTION_AUDIT_LOG
+      (LOG_DATE, USER_NAME, EDITION, APP_NAME, ACTION_TYPE, LOG_COMMENT)
     VALUES
-      (systimestamp,
+      (SYSDATE,
        USER,
-       sys_context('USERENV', 'CURRENT_EDITION_NAME'),
-       p_app_name,
-       p_action_type,
-       p_log_comment);
+       SYS_CONTEXT('USERENV', 'CURRENT_EDITION_NAME'),
+       P_APP_NAME,
+       P_ACTION_TYPE,
+       P_LOG_COMMENT);
     COMMIT;
-  END log_action;
+  END LOG_ACTION;
 
-  PROCEDURE log_data_change(p_app_name      VARCHAR2,
-                            p_owner         VARCHAR2,
-                            p_table_name    VARCHAR2,
-                            p_action_type   VARCHAR2,
-                            p_dml_type      VARCHAR2,
-                            p_recs_affected INTEGER,
-                            p_log_comment   VARCHAR2) IS
+  PROCEDURE LOG_DATA_CHANGE(P_APP_NAME      VARCHAR2,
+                            P_OWNER         VARCHAR2,
+                            P_TABLE_NAME    VARCHAR2,
+                            P_ACTION_TYPE   VARCHAR2,
+                            P_DML_TYPE      VARCHAR2,
+                            P_RECS_AFFECTED INTEGER,
+                            P_LOG_COMMENT   VARCHAR2) IS
     PRAGMA AUTONOMOUS_TRANSACTION;
   BEGIN
-    INSERT INTO data_audit_log
-      (log_timestamp,
-       user_name,
-       edition,
-       app_name,
-       tab_owner,
-       tab_name,
-       action_type,
-       dml_type,
-       recs_affected,
-       log_comment)
+    INSERT INTO DATA_AUDIT_LOG
+      (LOG_DATE,
+       USER_NAME,
+       EDITION,
+       APP_NAME,
+       TAB_OWNER,
+       TAB_NAME,
+       ACTION_TYPE,
+       DML_TYPE,
+       RECS_AFFECTED,
+       LOG_COMMENT)
     VALUES
-      (systimestamp,
+      (SYSDATE,
        USER,
-       sys_context('USERENV', 'CURRENT_EDITION_NAME'),
-       p_app_name,
-       p_owner,
-       p_table_name,
-       p_action_type,
-       p_dml_type,
-       p_recs_affected,
-       p_log_comment);
+       SYS_CONTEXT('USERENV', 'CURRENT_EDITION_NAME'),
+       P_APP_NAME,
+       P_OWNER,
+       P_TABLE_NAME,
+       P_ACTION_TYPE,
+       P_DML_TYPE,
+       P_RECS_AFFECTED,
+       P_LOG_COMMENT);
     COMMIT;
-  END log_data_change;
+  END LOG_DATA_CHANGE;
 
-  PROCEDURE log_ddl_change(p_object_owner VARCHAR2,
-                           p_object_name  VARCHAR2,
-                           p_object_type  VARCHAR2,
-                           p_parent_name  VARCHAR2,
-                           p_ticket       VARCHAR2,
-                           p_sql_executed VARCHAR2,
-                           p_message      VARCHAR2,
-                           p_svn_id       VARCHAR2) IS
+  PROCEDURE LOG_DDL_CHANGE(P_OBJECT_OWNER VARCHAR2,
+                           P_OBJECT_NAME  VARCHAR2,
+                           P_OBJECT_TYPE  VARCHAR2,
+                           P_PARENT_NAME  VARCHAR2,
+                           P_TICKET       VARCHAR2,
+                           P_SQL_EXECUTED VARCHAR2,
+                           P_MESSAGE      VARCHAR2,
+                           P_SVN_ID       VARCHAR2) IS
     PRAGMA AUTONOMOUS_TRANSACTION;
-    l_source_file  err_log.source_file%TYPE;
-    l_revision     err_log.revision%TYPE;
-    l_rev_author   err_log.rev_author%TYPE;
-    l_rev_date     err_log.rev_date%TYPE;
-    l_remaining    VARCHAR2(2000);
-    l_loc          PLS_INTEGER;
-    l_rollback_ddl VARCHAR2(2000);
+    L_SOURCE_FILE  ERR_LOG.SOURCE_FILE%TYPE;
+    L_REVISION     ERR_LOG.REVISION%TYPE;
+    L_REV_AUTHOR   ERR_LOG.REV_AUTHOR%TYPE;
+    L_REV_DATE     ERR_LOG.REV_DATE%TYPE;
+    L_REMAINING    VARCHAR2(2000);
+    L_LOC          PLS_INTEGER;
+    L_ROLLBACK_DDL VARCHAR2(2000);
   BEGIN
     -- Parse the p_svn_id argument into parts to store in the table
-    l_remaining := TRIM(ltrim(p_svn_id, '$Id:'));
+    L_REMAINING := TRIM(LTRIM(P_SVN_ID, '$Id:'));
     -- source_file
-    l_loc         := instr(l_remaining, ' ', 1, 1);
-    l_source_file := TRIM(substr(l_remaining, 1, l_loc));
-    l_remaining   := TRIM(substr(l_remaining, l_loc + 1));
+    L_LOC         := INSTR(L_REMAINING, ' ', 1, 1);
+    L_SOURCE_FILE := TRIM(SUBSTR(L_REMAINING, 1, L_LOC));
+    L_REMAINING   := TRIM(SUBSTR(L_REMAINING, L_LOC + 1));
     -- revision
-    l_loc       := instr(l_remaining, ' ', 1, 1);
-    l_revision  := TRIM(substr(l_remaining, 1, l_loc));
-    l_remaining := TRIM(substr(l_remaining, l_loc + 1));
+    L_LOC       := INSTR(L_REMAINING, ' ', 1, 1);
+    L_REVISION  := TRIM(SUBSTR(L_REMAINING, 1, L_LOC));
+    L_REMAINING := TRIM(SUBSTR(L_REMAINING, L_LOC + 1));
     -- l_rev_date
-    l_loc      := instr(l_remaining, ' ', 1, 2);
-    l_rev_date := TRIM(substr(l_remaining, 1, l_loc));
+    L_LOC      := INSTR(L_REMAINING, ' ', 1, 2);
+    L_REV_DATE := TRIM(SUBSTR(L_REMAINING, 1, L_LOC));
     -- rev_author
-    l_rev_author := TRIM(rtrim(substr(l_remaining, l_loc + 1), '$'));
+    L_REV_AUTHOR := TRIM(RTRIM(SUBSTR(L_REMAINING, L_LOC + 1), '$'));
     -- generate rollback DDL
-    IF p_object_type IN ('TABLE', 'SEQUENCE', 'JOB', 'CONSTRAINT', 'INDEX', 'COLUMN') THEN
-      l_rollback_ddl := 'exec deploy_utils.drop_object(''' || p_ticket || ''',''' ||
-                        p_object_type || ''',''' || p_object_owner || ''',''' || p_object_name ||
-                        ''')';
+    IF P_OBJECT_TYPE IN
+       ('TABLE', 'SEQUENCE', 'JOB', 'CONSTRAINT', 'INDEX', 'COLUMN') THEN
+      L_ROLLBACK_DDL := 'exec deploy_utils.drop_object(''' || P_TICKET ||
+                        ''',''' || P_OBJECT_TYPE || ''',''' ||
+                        P_OBJECT_OWNER || ''',''' || P_OBJECT_NAME || ''')';
     END IF;
     -- Insert this info into the table
-    INSERT INTO ddl_audit_log
-      (object_owner,
-       object_name,
-       object_type,
-       parent_name,
-       ticket,
-       sql_executed,
-       edition,
-       source_file,
-       revision,
-       rev_author,
-       rev_date,
-       message,
-       rollback_ddl)
+    INSERT INTO DDL_AUDIT_LOG
+      (OBJECT_OWNER,
+       OBJECT_NAME,
+       OBJECT_TYPE,
+       PARENT_NAME,
+       TICKET,
+       SQL_EXECUTED,
+       EDITION,
+       SOURCE_FILE,
+       REVISION,
+       REV_AUTHOR,
+       REV_DATE,
+       MESSAGE,
+       ROLLBACK_DDL)
     VALUES
-      (p_object_owner,
-       p_object_name,
-       p_object_type,
-       p_parent_name,
-       p_ticket,
-       p_sql_executed,
-       sys_context('USERENV', 'CURRENT_EDITION_NAME'),
-       l_source_file,
-       l_revision,
-       l_rev_author,
-       l_rev_date,
-       p_message,
-       l_rollback_ddl);
+      (P_OBJECT_OWNER,
+       P_OBJECT_NAME,
+       P_OBJECT_TYPE,
+       P_PARENT_NAME,
+       P_TICKET,
+       P_SQL_EXECUTED,
+       SYS_CONTEXT('USERENV', 'CURRENT_EDITION_NAME'),
+       L_SOURCE_FILE,
+       L_REVISION,
+       L_REV_AUTHOR,
+       L_REV_DATE,
+       P_MESSAGE,
+       L_ROLLBACK_DDL);
     COMMIT;
-  END log_ddl_change;
+  END LOG_DDL_CHANGE;
 
-  PROCEDURE log_pkg_init(p_package VARCHAR2, p_svn_id VARCHAR2) IS
+  PROCEDURE LOG_PKG_INIT(P_PACKAGE VARCHAR2, P_SVN_ID VARCHAR2) IS
     PRAGMA AUTONOMOUS_TRANSACTION;
-    l_source_file  err_log.source_file%TYPE;
-    l_revision     err_log.revision%TYPE;
-    l_rev_author   err_log.rev_author%TYPE;
-    l_rev_date     err_log.rev_date%TYPE;
-    l_remaining    VARCHAR2(2000);
-    l_loc          PLS_INTEGER;
-    v_last_load_ts pkg_run_log.last_load_ts%TYPE;
+    L_SOURCE_FILE    ERR_LOG.SOURCE_FILE%TYPE;
+    L_REVISION       ERR_LOG.REVISION%TYPE;
+    L_REV_AUTHOR     ERR_LOG.REV_AUTHOR%TYPE;
+    L_REV_DATE       ERR_LOG.REV_DATE%TYPE;
+    L_REMAINING      VARCHAR2(2000);
+    L_LOC            PLS_INTEGER;
+    V_LAST_LOAD_DATE PKG_RUN_LOG.LAST_LOAD_DATE%TYPE;
   BEGIN
     -- check whether it has been at least an hour since we've updated this record
-    SELECT MAX(last_load_ts) INTO v_last_load_ts FROM pkg_run_log WHERE PACKAGE = p_package;
-    IF (v_last_load_ts IS NULL OR v_last_load_ts < current_timestamp - INTERVAL '60' minute) THEN
+    SELECT MAX(LAST_LOAD_DATE)
+      INTO V_LAST_LOAD_DATE
+      FROM PKG_RUN_LOG
+     WHERE PACKAGE = P_PACKAGE;
+    IF (V_LAST_LOAD_DATE IS NULL OR
+       V_LAST_LOAD_DATE < CURRENT_TIMESTAMP - INTERVAL '60' MINUTE) THEN
       -- Parse the p_svn_id argument into parts to store in the table
-      l_remaining := TRIM(ltrim(p_svn_id, '$Id:'));
+      L_REMAINING := TRIM(LTRIM(P_SVN_ID, '$Id:'));
       -- source_file
-      l_loc         := instr(l_remaining, ' ', 1, 1);
-      l_source_file := TRIM(substr(l_remaining, 1, l_loc));
-      l_remaining   := TRIM(substr(l_remaining, l_loc + 1));
+      L_LOC         := INSTR(L_REMAINING, ' ', 1, 1);
+      L_SOURCE_FILE := TRIM(SUBSTR(L_REMAINING, 1, L_LOC));
+      L_REMAINING   := TRIM(SUBSTR(L_REMAINING, L_LOC + 1));
       -- revision
-      l_loc       := instr(l_remaining, ' ', 1, 1);
-      l_revision  := TRIM(substr(l_remaining, 1, l_loc));
-      l_remaining := TRIM(substr(l_remaining, l_loc + 1));
+      L_LOC       := INSTR(L_REMAINING, ' ', 1, 1);
+      L_REVISION  := TRIM(SUBSTR(L_REMAINING, 1, L_LOC));
+      L_REMAINING := TRIM(SUBSTR(L_REMAINING, L_LOC + 1));
       -- l_rev_date
-      l_loc      := instr(l_remaining, ' ', 1, 2);
-      l_rev_date := TRIM(substr(l_remaining, 1, l_loc));
+      L_LOC      := INSTR(L_REMAINING, ' ', 1, 2);
+      L_REV_DATE := TRIM(SUBSTR(L_REMAINING, 1, L_LOC));
       -- rev_author
-      l_rev_author := TRIM(rtrim(substr(l_remaining, l_loc + 1), '$'));
+      L_REV_AUTHOR := TRIM(RTRIM(SUBSTR(L_REMAINING, L_LOC + 1), '$'));
       -- Merge this info into the table
-      MERGE INTO pkg_run_log a
-      USING (SELECT p_package PACKAGE,
-                    l_revision revision,
-                    sys_context('USERENV', 'CURRENT_EDITION_NAME') edition,
-                    l_source_file source_file,
-                    l_rev_date rev_date,
-                    l_rev_author rev_author,
-                    systimestamp last_load_ts,
-                    USER last_load_user
-               FROM dual) b
-      ON (a.package = b.package AND a.revision = b.revision AND a.edition = b.edition)
+      MERGE INTO PKG_RUN_LOG A
+      USING (SELECT P_PACKAGE PACKAGE,
+                    L_REVISION REVISION,
+                    SYS_CONTEXT('USERENV', 'CURRENT_EDITION_NAME') EDITION,
+                    L_SOURCE_FILE SOURCE_FILE,
+                    L_REV_DATE REV_DATE,
+                    L_REV_AUTHOR REV_AUTHOR,
+                    SYSDATE LAST_LOAD_DATE,
+                    USER LAST_LOAD_USER
+               FROM DUAL) B
+      ON (A.PACKAGE = B.PACKAGE AND A.REVISION = B.REVISION AND A.EDITION = B.EDITION)
       WHEN NOT MATCHED THEN
         INSERT
           (PACKAGE,
-           revision,
-           edition,
-           source_file,
-           rev_date,
-           rev_author,
-           last_load_ts,
-           last_load_user)
+           REVISION,
+           EDITION,
+           SOURCE_FILE,
+           REV_DATE,
+           REV_AUTHOR,
+           LAST_LOAD_DATE,
+           LAST_LOAD_USER)
         VALUES
-          (p_package,
-           l_revision,
-           sys_context('USERENV', 'CURRENT_EDITION_NAME'),
-           l_source_file,
-           l_rev_date,
-           l_rev_author,
-           systimestamp,
+          (P_PACKAGE,
+           L_REVISION,
+           SYS_CONTEXT('USERENV', 'CURRENT_EDITION_NAME'),
+           L_SOURCE_FILE,
+           L_REV_DATE,
+           L_REV_AUTHOR,
+           SYSDATE,
            USER)
       WHEN MATCHED THEN
         UPDATE
-           SET a.source_file    = b.source_file,
-               a.rev_date       = b.rev_date,
-               a.rev_author     = b.rev_author,
-               a.last_load_ts   = b.last_load_ts,
-               a.last_load_user = b.last_load_user;
+           SET A.SOURCE_FILE    = B.SOURCE_FILE,
+               A.REV_DATE       = B.REV_DATE,
+               A.REV_AUTHOR     = B.REV_AUTHOR,
+               A.LAST_LOAD_DATE = B.LAST_LOAD_DATE,
+               A.LAST_LOAD_USER = B.LAST_LOAD_USER;
       COMMIT;
     END IF;
-  END log_pkg_init;
+  END LOG_PKG_INIT;
 
 BEGIN
-  log_pkg_init($$PLSQL_UNIT, lc_svn_id);
-END audit_pkg;
+  LOG_PKG_INIT($$PLSQL_UNIT, LC_SVN_ID);
+END AUDIT_PKG;
 /
-SHOW ERRORS

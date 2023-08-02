@@ -10,21 +10,21 @@ COL spool_name FOR a40 new_value spool_name
 SELECT 'InstallDeployUtils_'||db_unique_name||'_'||to_char(SYSDATE,'YYMMDDHH24MI')||'.sql' spool_name from v$database;
 SPOOL &spool_name
 
---ALTER USER dbadmin DEFAULT ROLE ALL;
---GRANT SELECT ON sys.dba_editions TO dbadmin;
---GRANT SELECT ON sys.dba_tab_privs TO dbadmin;
---GRANT SELECT ON sys.dba_role_privs TO dbadmin;
---GRANT SELECT ON sys.dba_synonyms TO dbadmin;
---GRANT SELECT ON sys.dba_users TO dbadmin;
---GRANT SELECT ON sys.dba_views TO dbadmin;
---GRANT SELECT ON sys.dba_objects_ae TO dbadmin;
---GRANT SELECT ON sys.dba_objects TO dbadmin;
---GRANT SELECT ON sys.dba_parallel_execute_tasks TO dbadmin;
---GRANT SELECT ON sys.dba_parallel_execute_chunks TO dbadmin;
---GRANT SELECT ON sys.dba_roles TO dbadmin;
---GRANT SELECT ON sys.dba_scheduler_jobs TO dbadmin;
---GRANT SELECT ON sys.gv_$session TO dbadmin;
---GRANT EXECUTE ON sys.dbms_lock TO dbadmin;
+--ALTER USER &&1 DEFAULT ROLE ALL;
+--GRANT SELECT ON sys.dba_editions TO &&1;
+--GRANT SELECT ON sys.dba_tab_privs TO &&1;
+--GRANT SELECT ON sys.dba_role_privs TO &&1;
+--GRANT SELECT ON sys.dba_synonyms TO &&1;
+--GRANT SELECT ON sys.dba_users TO &&1;
+--GRANT SELECT ON sys.dba_views TO &&1;
+--GRANT SELECT ON sys.dba_objects_ae TO &&1;
+--GRANT SELECT ON sys.dba_objects TO &&1;
+GRANT SELECT ON sys.dba_parallel_execute_tasks TO &&1;
+GRANT SELECT ON sys.dba_parallel_execute_chunks TO &&1;
+--GRANT SELECT ON sys.dba_roles TO &&1;
+GRANT SELECT ON sys.dba_scheduler_jobs TO &&1;
+--GRANT SELECT ON sys.gv_$session TO &&1;
+--GRANT EXECUTE ON sys.dbms_lock TO &&1;
 
 -- Create tables
 PROMPT pkg_run_log.sql

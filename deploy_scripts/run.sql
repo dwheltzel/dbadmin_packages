@@ -7,5 +7,5 @@ DEFINE schema_pass = 'nwh4ueSuTr1l'
 
 ALTER SESSION SET CURRENT_SCHEMA=&&schema_name;
 
-@deploy_scripts/create_base.sql
+@deploy_scripts/create_base.sql &&schema_name
 
