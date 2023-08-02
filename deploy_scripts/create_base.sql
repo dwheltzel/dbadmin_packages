@@ -42,7 +42,7 @@ PROMPT action_audit_log.sql
 PROMPT registrytable.sql
 @tables/registrytable.sql
 
--- Create packages
+-- Create base packages
 PROMPT audit_pkg_spec.sql
 @packages/audit_pkg_spec.sql
 PROMPT audit_pkg_other.sql
@@ -57,6 +57,20 @@ PROMPT deploy_utils_body.sql
 --PROMPT Verify the deploy is correct
 BEGIN deploy_utils.pkg_info; END;
 /
+
+-- Create extra packages
+PROMPT trim_utils_spec.sql
+@packages/trim_utils_spec.sql
+PROMPT trim_utils_other.sql
+@packages/trim_utils_other.sql
+PROMPT trim_utils_body.sql
+@packages/trim_utils_body.sql
+PROMPT registry_spec.sql
+@packages/registry_spec.sql
+PROMPT registry_other.sql
+@packages/registry_other.sql
+PROMPT registry_body.sql
+@packages/registry_body.sql
 
 SPOOL OFF
 EXIT
