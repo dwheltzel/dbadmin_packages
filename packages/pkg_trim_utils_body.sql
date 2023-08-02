@@ -1,79 +1,78 @@
-SET DEFINE OFF
-
-CREATE OR REPLACE PACKAGE BODY PKG_TRIM_UTILS
+CREATE OR REPLACE PACKAGE BODY COMSPOC_DBA.PKG_TRIM_UTILS
 -- Author: dheltzel
  AS
 
-  lc_svn_id VARCHAR2(200) := 'trim_utils_body.sql dheltzel';
+  LC_SVN_ID VARCHAR2(200) := 'trim_utils_body.sql dheltzel';
 
-  lv_proc_name err_log.proc_name%TYPE;
+  LV_PROC_NAME ERR_LOG.PROC_NAME%TYPE;
 
-  lv_comment err_log.source_file%TYPE := 'Starting';
+  LV_COMMENT ERR_LOG.SOURCE_FILE%TYPE := 'Starting';
 
   -- Rename partitions and subpartitions with system generated names
-  PROCEDURE part_rename_api_request_log IS
-    c_high_value VARCHAR2(30);
-    v_suffix     VARCHAR2(5);
-    n_high_value PLS_INTEGER;
+  PROCEDURE PART_RENAME_API_REQUEST_LOG IS
+    C_HIGH_VALUE VARCHAR2(30);
+    V_SUFFIX     VARCHAR2(5);
+    N_HIGH_VALUE PLS_INTEGER;
   BEGIN
-    lv_proc_name := 'part_rename_api_request_log';
-    lv_comment   := 'Renaming Partitions';
-    FOR r IN (SELECT partition_name, high_value
-                FROM dba_tab_partitions
-               WHERE table_owner = 'WEBAPI'
-                 AND table_name = 'API_REQUEST_LOG2_'
-                 AND partition_name LIKE 'SYS%') LOOP
-      c_high_value := r.high_value;
-      n_high_value := to_number(TRIM(c_high_value)) - 1;
+    LV_PROC_NAME := 'part_rename_api_request_log';
+    LV_COMMENT   := 'Renaming Partitions';
+    FOR R IN (SELECT PARTITION_NAME, HIGH_VALUE
+                FROM DBA_TAB_PARTITIONS
+               WHERE TABLE_OWNER = 'WEBAPI'
+                 AND TABLE_NAME = 'API_REQUEST_LOG2_'
+                 AND PARTITION_NAME LIKE 'SYS%') LOOP
+      C_HIGH_VALUE := R.HIGH_VALUE;
+      N_HIGH_VALUE := TO_NUMBER(TRIM(C_HIGH_VALUE)) - 1;
       /*      dbms_output.put_line('alter table WEBAPI.API_REQUEST_LOG2_ rename partition ' ||
       r.partition_name || ' to ARL_' ||
       to_char(n_high_value) || ';');*/
       EXECUTE IMMEDIATE 'alter table WEBAPI.API_REQUEST_LOG2_ rename partition ' ||
-                        r.partition_name || ' to ARL_' ||
-                        to_char(n_high_value);
+                        R.PARTITION_NAME || ' to ARL_' ||
+                        TO_CHAR(N_HIGH_VALUE);
     END LOOP;
-    lv_comment := 'Renaming Subpartitions';
-    FOR r IN (SELECT partition_name, subpartition_name, high_value
-                FROM dba_tab_subpartitions
-               WHERE table_owner = 'WEBAPI'
-                 AND table_name = 'API_REQUEST_LOG2_'
-                 AND subpartition_name LIKE 'SYS%') LOOP
-      c_high_value := r.high_value;
-      CASE c_high_value
+    LV_COMMENT := 'Renaming Subpartitions';
+    FOR R IN (SELECT PARTITION_NAME, SUBPARTITION_NAME, HIGH_VALUE
+                FROM DBA_TAB_SUBPARTITIONS
+               WHERE TABLE_OWNER = 'WEBAPI'
+                 AND TABLE_NAME = 'API_REQUEST_LOG2_'
+                 AND SUBPARTITION_NAME LIKE 'SYS%') LOOP
+      C_HIGH_VALUE := R.HIGH_VALUE;
+      CASE C_HIGH_VALUE
         WHEN '2' THEN
-          v_suffix := 'JAN';
+          V_SUFFIX := 'JAN';
         WHEN '3' THEN
-          v_suffix := 'FEB';
+          V_SUFFIX := 'FEB';
         WHEN '4' THEN
-          v_suffix := 'MAR';
+          V_SUFFIX := 'MAR';
         WHEN '5' THEN
-          v_suffix := 'APR';
+          V_SUFFIX := 'APR';
         WHEN '6' THEN
-          v_suffix := 'MAY';
+          V_SUFFIX := 'MAY';
         WHEN '7' THEN
-          v_suffix := 'JUN';
+          V_SUFFIX := 'JUN';
         WHEN '8' THEN
-          v_suffix := 'JUL';
+          V_SUFFIX := 'JUL';
         WHEN '9' THEN
-          v_suffix := 'AUG';
+          V_SUFFIX := 'AUG';
         WHEN '10' THEN
-          v_suffix := 'SEP';
+          V_SUFFIX := 'SEP';
         WHEN '11' THEN
-          v_suffix := 'OCT';
+          V_SUFFIX := 'OCT';
         WHEN '12' THEN
-          v_suffix := 'NOV';
+          V_SUFFIX := 'NOV';
         WHEN 'MAXVALUE' THEN
-          v_suffix := 'DECE';
+          V_SUFFIX := 'DECE';
       END CASE;
       /*      dbms_output.put_line('alter table WEBAPI.API_REQUEST_LOG2_ rename subpartition ' ||
       r.subpartition_name || ' to ' ||
       r.partition_name || '_' || v_suffix || ';');*/
       EXECUTE IMMEDIATE 'alter table WEBAPI.API_REQUEST_LOG2_ rename subpartition ' ||
-                        r.subpartition_name || ' to ' || r.partition_name || '_' ||
-                        v_suffix;
+                        R.SUBPARTITION_NAME || ' to ' || R.PARTITION_NAME || '_' ||
+                        V_SUFFIX;
     END LOOP;
   EXCEPTION
     WHEN OTHERS THEN
+<<<<<<< Updated upstream
       pkg_audit.log_error(lc_svn_id,
                                   lv_proc_name,
                                   lv_comment,
@@ -83,65 +82,76 @@ CREATE OR REPLACE PACKAGE BODY PKG_TRIM_UTILS
                                   SQLCODE,
                                   SQLERRM);
   END part_rename_api_request_log;
+=======
+      PKG_AUDIT.LOG_ERROR(LC_SVN_ID,
+                          LV_PROC_NAME,
+                          LV_COMMENT,
+                          'WEBAPI.API_REQUEST_LOG_',
+                          $$PLSQL_UNIT,
+                          $$PLSQL_LINE,
+                          SQLCODE,
+                          SQLERRM);
+  END PART_RENAME_API_REQUEST_LOG;
+>>>>>>> Stashed changes
 
-  FUNCTION chk_settings(var_name IN VARCHAR2) RETURN VARCHAR2 IS
+  FUNCTION CHK_SETTINGS(VAR_NAME IN VARCHAR2) RETURN VARCHAR2 IS
     RESULT VARCHAR2(100);
   BEGIN
-    RESULT := registry.get_value(var_name, 'TRIM');
+    RESULT := PKG_REGISTRY.GET_VALUE(VAR_NAME, 'TRIM');
     IF RESULT IS NOT NULL THEN
-      DELETE FROM registrytable
-       WHERE namespace = 'TRIM'
-         AND NAME = var_name
-         AND immutable = 'N';
+      DELETE FROM REGISTRYTABLE
+       WHERE NAMESPACE = 'TRIM'
+         AND NAME = VAR_NAME
+         AND IMMUTABLE = 'N';
     END IF;
     RETURN(RESULT);
-  END chk_settings;
+  END CHK_SETTINGS;
 
-  PROCEDURE trim_large_table(p_owner           VARCHAR2,
-                              p_table_name      VARCHAR2,
-                              p_sql             VARCHAR2,
-                              p_keep_days       PLS_INTEGER DEFAULT 365,
-                              p_sleep_time      PLS_INTEGER DEFAULT 2,
-                              p_chunk_size      PLS_INTEGER DEFAULT 500,
-                              p_commit_interval PLS_INTEGER DEFAULT 1000,
-                              p_chkpnt_interval PLS_INTEGER DEFAULT 100,
-                              p_max_run_time    PLS_INTEGER DEFAULT 0,
-                              p_exit_time       VARCHAR2 DEFAULT NULL,
-                              p_log_always      VARCHAR2 DEFAULT 'N') IS
-    l_chkpnt_count     PLS_INTEGER := 0;
-    l_uncommitted_recs PLS_INTEGER := 0;
-    l_deleted_recs     PLS_INTEGER := 0;
-    l_affected_recs    PLS_INTEGER;
-    l_commit_cnt       PLS_INTEGER := 0;
-    l_row_count        PLS_INTEGER;
-    l_start_time       DATE;
-    l_registry_value   VARCHAR2(100);
-    l_sleep_time       PLS_INTEGER := p_sleep_time;
-    l_commit_interval  PLS_INTEGER := p_commit_interval;
-    l_chkpnt_interval  PLS_INTEGER := p_chkpnt_interval;
+  PROCEDURE TRIM_LARGE_TABLE(P_OWNER           VARCHAR2,
+                             P_TABLE_NAME      VARCHAR2,
+                             P_SQL             VARCHAR2,
+                             P_KEEP_DAYS       PLS_INTEGER DEFAULT 365,
+                             P_SLEEP_TIME      PLS_INTEGER DEFAULT 2,
+                             P_CHUNK_SIZE      PLS_INTEGER DEFAULT 500,
+                             P_COMMIT_INTERVAL PLS_INTEGER DEFAULT 1000,
+                             P_CHKPNT_INTERVAL PLS_INTEGER DEFAULT 100,
+                             P_MAX_RUN_TIME    PLS_INTEGER DEFAULT 0,
+                             P_EXIT_TIME       VARCHAR2 DEFAULT NULL,
+                             P_LOG_ALWAYS      VARCHAR2 DEFAULT 'N') IS
+    L_CHKPNT_COUNT     PLS_INTEGER := 0;
+    L_UNCOMMITTED_RECS PLS_INTEGER := 0;
+    L_DELETED_RECS     PLS_INTEGER := 0;
+    L_AFFECTED_RECS    PLS_INTEGER;
+    L_COMMIT_CNT       PLS_INTEGER := 0;
+    L_ROW_COUNT        PLS_INTEGER;
+    L_START_TIME       DATE;
+    L_REGISTRY_VALUE   VARCHAR2(100);
+    L_SLEEP_TIME       PLS_INTEGER := P_SLEEP_TIME;
+    L_COMMIT_INTERVAL  PLS_INTEGER := P_COMMIT_INTERVAL;
+    L_CHKPNT_INTERVAL  PLS_INTEGER := P_CHKPNT_INTERVAL;
   BEGIN
-    lv_proc_name := 'trim_large_table';
-    lv_comment   := 'Report runtime parameters';
-    dbms_application_info.set_module(lv_proc_name, p_table_name);
-    dbms_application_info.set_client_info('Starting up');
+    LV_PROC_NAME := 'trim_large_table';
+    LV_COMMENT   := 'Report runtime parameters';
+    DBMS_APPLICATION_INFO.SET_MODULE(LV_PROC_NAME, P_TABLE_NAME);
+    DBMS_APPLICATION_INFO.SET_CLIENT_INFO('Starting up');
     -- This process is restartable. If an existing task with this table name exists, check for unprocessed chunks
-    lv_comment := 'Check for an existing task';
+    LV_COMMENT := 'Check for an existing task';
     SELECT COUNT(*)
-      INTO l_row_count
-      FROM sys.dba_parallel_execute_tasks
-     WHERE task_name = p_table_name;
-    IF (l_row_count > 0) THEN
-      lv_comment := 'Check for unprocessed chunks';
+      INTO L_ROW_COUNT
+      FROM SYS.DBA_PARALLEL_EXECUTE_TASKS
+     WHERE TASK_NAME = P_TABLE_NAME;
+    IF (L_ROW_COUNT > 0) THEN
+      LV_COMMENT := 'Check for unprocessed chunks';
       SELECT COUNT(*)
-        INTO l_row_count
-        FROM sys.dba_parallel_execute_chunks
-       WHERE task_name = p_table_name
-         AND status <> 'PROCESSED';
+        INTO L_ROW_COUNT
+        FROM SYS.DBA_PARALLEL_EXECUTE_CHUNKS
+       WHERE TASK_NAME = P_TABLE_NAME
+         AND STATUS <> 'PROCESSED';
       -- If there are no unprocessed chunks for the task, drop it
-      IF (l_row_count = 0) THEN
-        lv_comment := 'Drop the existing task';
+      IF (L_ROW_COUNT = 0) THEN
+        LV_COMMENT := 'Drop the existing task';
         BEGIN
-          dbms_parallel_execute.drop_task(p_table_name);
+          DBMS_PARALLEL_EXECUTE.DROP_TASK(P_TABLE_NAME);
         EXCEPTION
           WHEN OTHERS THEN
             NULL;
@@ -149,105 +159,113 @@ CREATE OR REPLACE PACKAGE BODY PKG_TRIM_UTILS
       END IF;
     END IF;
     -- If the task does not exist (or was just dropped because the last run completed), create it and all the chunks
-    IF (l_row_count = 0) THEN
-      lv_comment := 'Create the Objects, task, and chunk by ROWID';
-      dbms_parallel_execute.create_task(p_table_name);
-      dbms_parallel_execute.create_chunks_by_rowid(p_table_name,
-                                                   p_owner,
-                                                   p_table_name,
+    IF (L_ROW_COUNT = 0) THEN
+      LV_COMMENT := 'Create the Objects, task, and chunk by ROWID';
+      DBMS_PARALLEL_EXECUTE.CREATE_TASK(P_TABLE_NAME);
+      DBMS_PARALLEL_EXECUTE.CREATE_CHUNKS_BY_ROWID(P_TABLE_NAME,
+                                                   P_OWNER,
+                                                   P_TABLE_NAME,
                                                    FALSE,
-                                                   p_chunk_size);
+                                                   P_CHUNK_SIZE);
     END IF;
-    lv_comment   := 'Process each chunk and commit';
-    l_start_time := SYSDATE;
+    LV_COMMENT   := 'Process each chunk and commit';
+    L_START_TIME := SYSDATE;
     -- Process each chunk and commit.
-    FOR chunk IN (SELECT chunk_id, start_rowid, end_rowid
-                    FROM sys.dba_parallel_execute_chunks
-                   WHERE task_name = p_table_name
-                     AND status <> 'PROCESSED'
-                   ORDER BY chunk_id) LOOP
+    FOR CHUNK IN (SELECT CHUNK_ID, START_ROWID, END_ROWID
+                    FROM SYS.DBA_PARALLEL_EXECUTE_CHUNKS
+                   WHERE TASK_NAME = P_TABLE_NAME
+                     AND STATUS <> 'PROCESSED'
+                   ORDER BY CHUNK_ID) LOOP
       BEGIN
-        EXECUTE IMMEDIATE p_sql
-          USING chunk.start_rowid, chunk.end_rowid, p_keep_days;
-        l_affected_recs    := SQL%ROWCOUNT;
-        l_uncommitted_recs := l_uncommitted_recs + l_affected_recs;
-        l_deleted_recs     := l_deleted_recs + l_affected_recs;
-        dbms_parallel_execute.set_chunk_status(p_table_name,
-                                               chunk.chunk_id,
-                                               dbms_parallel_execute.processed);
-        IF (l_uncommitted_recs > l_commit_interval) THEN
-          lv_comment := 'Do commit';
+        EXECUTE IMMEDIATE P_SQL
+          USING CHUNK.START_ROWID, CHUNK.END_ROWID, P_KEEP_DAYS;
+        L_AFFECTED_RECS    := SQL%ROWCOUNT;
+        L_UNCOMMITTED_RECS := L_UNCOMMITTED_RECS + L_AFFECTED_RECS;
+        L_DELETED_RECS     := L_DELETED_RECS + L_AFFECTED_RECS;
+        DBMS_PARALLEL_EXECUTE.SET_CHUNK_STATUS(P_TABLE_NAME,
+                                               CHUNK.CHUNK_ID,
+                                               DBMS_PARALLEL_EXECUTE.PROCESSED);
+        IF (L_UNCOMMITTED_RECS > L_COMMIT_INTERVAL) THEN
+          LV_COMMENT := 'Do commit';
           COMMIT;
-          l_uncommitted_recs := 0;
-          l_commit_cnt       := l_commit_cnt + 1;
+          L_UNCOMMITTED_RECS := 0;
+          L_COMMIT_CNT       := L_COMMIT_CNT + 1;
           -- update the record count and other stats
-          dbms_application_info.set_client_info('Deleted ' ||
-                                                l_deleted_recs ||
+          DBMS_APPLICATION_INFO.SET_CLIENT_INFO('Deleted ' ||
+                                                L_DELETED_RECS ||
                                                 ' records, with ' ||
-                                                l_commit_cnt ||
+                                                L_COMMIT_CNT ||
                                                 ' commits, and ' ||
-                                                l_chkpnt_count ||
+                                                L_CHKPNT_COUNT ||
                                                 ' checkpoints (' ||
-                                                l_commit_interval || ':' ||
-                                                l_sleep_time || ' secs:' ||
-                                                l_chkpnt_interval || ')');
+                                                L_COMMIT_INTERVAL || ':' ||
+                                                L_SLEEP_TIME || ' secs:' ||
+                                                L_CHKPNT_INTERVAL || ')');
           -- before we sleep, check the registry table for updates
           -- See if we should quit the trim
-          lv_comment       := 'Check for new runtime params';
-          l_registry_value := chk_settings(p_table_name || '_QUIT');
-          IF l_registry_value IS NOT NULL THEN
+          LV_COMMENT       := 'Check for new runtime params';
+          L_REGISTRY_VALUE := CHK_SETTINGS(P_TABLE_NAME || '_QUIT');
+          IF L_REGISTRY_VALUE IS NOT NULL THEN
             EXIT;
           END IF;
           -- change any values
           -- seconds to sleep after a commit
-          l_sleep_time := nvl(chk_settings(p_table_name || '_SLEEP'),
-                              l_sleep_time);
+          L_SLEEP_TIME := NVL(CHK_SETTINGS(P_TABLE_NAME || '_SLEEP'),
+                              L_SLEEP_TIME);
           -- Commit after this many record changes
-          l_commit_interval := nvl(chk_settings(p_table_name || '_COMMIT'),
-                                   l_commit_interval);
+          L_COMMIT_INTERVAL := NVL(CHK_SETTINGS(P_TABLE_NAME || '_COMMIT'),
+                                   L_COMMIT_INTERVAL);
           -- Checkpoint after this many commits
-          l_chkpnt_interval := nvl(chk_settings(p_table_name ||
+          L_CHKPNT_INTERVAL := NVL(CHK_SETTINGS(P_TABLE_NAME ||
                                                 '_CHECKPOINT'),
-                                   l_chkpnt_interval);
-          lv_comment        := 'Sleeping';
-          dbms_lock.sleep(l_sleep_time);
-          lv_comment := 'Checkpoint if needed';
-          IF MOD(l_commit_cnt, l_chkpnt_interval) = 0 THEN
+                                   L_CHKPNT_INTERVAL);
+          LV_COMMENT        := 'Sleeping';
+          DBMS_SESSION.SLEEP(L_SLEEP_TIME);
+          LV_COMMENT := 'Checkpoint if needed';
+          IF MOD(L_COMMIT_CNT, L_CHKPNT_INTERVAL) = 0 THEN
             EXECUTE IMMEDIATE 'alter system checkpoint';
-            l_chkpnt_count := l_chkpnt_count + 1;
+            L_CHKPNT_COUNT := L_CHKPNT_COUNT + 1;
           END IF;
         END IF;
       EXCEPTION
         WHEN OTHERS THEN
-          dbms_parallel_execute.set_chunk_status(p_table_name,
-                                                 chunk.chunk_id,
-                                                 dbms_parallel_execute.processed_with_error,
+          DBMS_PARALLEL_EXECUTE.SET_CHUNK_STATUS(P_TABLE_NAME,
+                                                 CHUNK.CHUNK_ID,
+                                                 DBMS_PARALLEL_EXECUTE.PROCESSED_WITH_ERROR,
                                                  SQLCODE,
                                                  SQLERRM);
       END;
       -- p_max_run_time is in minutes (60 * 24)
-      lv_comment := 'Check if it is time to quit';
-      IF ((p_max_run_time > 0) AND
-         (1440 * (SYSDATE - l_start_time)) > p_max_run_time) THEN
+      LV_COMMENT := 'Check if it is time to quit';
+      IF ((P_MAX_RUN_TIME > 0) AND
+         (1440 * (SYSDATE - L_START_TIME)) > P_MAX_RUN_TIME) THEN
         EXIT;
       END IF;
       -- p_exit_time is a string like '23:30'
-      IF ((p_exit_time IS NOT NULL) AND
+      IF ((P_EXIT_TIME IS NOT NULL) AND
          (SYSDATE >
-         to_date(to_char(trunc(SYSDATE), 'MM/DD/YYYY') || p_exit_time,
+         TO_DATE(TO_CHAR(TRUNC(SYSDATE), 'MM/DD/YYYY') || P_EXIT_TIME,
                    'MM/DD/YYYYHH24:MI'))) THEN
         EXIT;
       END IF;
     END LOOP;
     COMMIT;
+<<<<<<< Updated upstream
     lv_comment := 'Log final counts';
     IF (l_deleted_recs > 0 OR p_log_always = 'Y') THEN
       pkg_audit.log_data_change(lv_proc_name,
                                 p_owner,
                                 p_table_name,
+=======
+    LV_COMMENT := 'Log final counts';
+    IF (L_DELETED_RECS > 0 OR P_LOG_ALWAYS = 'Y') THEN
+      PKG_AUDIT.LOG_DATA_CHANGE(LV_PROC_NAME,
+                                P_OWNER,
+                                P_TABLE_NAME,
+>>>>>>> Stashed changes
                                 'Trim',
                                 'D',
-                                l_deleted_recs,
+                                L_DELETED_RECS,
                                 '');
     END IF;
     /* dbms_output.put_line('Total deleted records: ' || l_deleted_recs);
@@ -255,6 +273,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_TRIM_UTILS
     dbms_output.put_line('Total checkpoints: ' || l_chkpnt_count);*/
   EXCEPTION
     WHEN OTHERS THEN
+<<<<<<< Updated upstream
       pkg_audit.log_error(lc_svn_id,
                                   lv_proc_name,
                                   lv_comment,
@@ -264,34 +283,54 @@ CREATE OR REPLACE PACKAGE BODY PKG_TRIM_UTILS
                                   SQLCODE,
                                   SQLERRM);
   END trim_large_table;
+=======
+      PKG_AUDIT.LOG_ERROR(LC_SVN_ID,
+                          LV_PROC_NAME,
+                          LV_COMMENT,
+                          P_OWNER || '.' || P_TABLE_NAME,
+                          $$PLSQL_UNIT,
+                          $$PLSQL_LINE,
+                          SQLCODE,
+                          SQLERRM);
+  END TRIM_LARGE_TABLE;
+>>>>>>> Stashed changes
 
   -- Generic proc to delete records from a small table
-  PROCEDURE trim_small_table(p_owner      VARCHAR2,
-                              p_table_name VARCHAR2,
-                              p_sql        VARCHAR2,
-                              p_log_always VARCHAR2 DEFAULT 'N') IS
-    l_deleted_recs PLS_INTEGER := 0;
+  PROCEDURE TRIM_SMALL_TABLE(P_OWNER      VARCHAR2,
+                             P_TABLE_NAME VARCHAR2,
+                             P_SQL        VARCHAR2,
+                             P_LOG_ALWAYS VARCHAR2 DEFAULT 'N') IS
+    L_DELETED_RECS PLS_INTEGER := 0;
   BEGIN
-    lv_proc_name := 'trim_small_table';
-    lv_comment   := 'Report runtime parameters';
-    dbms_application_info.set_module(lv_proc_name, p_table_name);
-    dbms_application_info.set_client_info('Starting up');
-    lv_comment := 'Run delete';
-    EXECUTE IMMEDIATE p_sql;
-    l_deleted_recs := SQL%ROWCOUNT;
+    LV_PROC_NAME := 'trim_small_table';
+    LV_COMMENT   := 'Report runtime parameters';
+    DBMS_APPLICATION_INFO.SET_MODULE(LV_PROC_NAME, P_TABLE_NAME);
+    DBMS_APPLICATION_INFO.SET_CLIENT_INFO('Starting up');
+    LV_COMMENT := 'Run delete';
+    EXECUTE IMMEDIATE P_SQL;
+    L_DELETED_RECS := SQL%ROWCOUNT;
     COMMIT;
+<<<<<<< Updated upstream
     lv_comment := 'Log final counts';
     IF (l_deleted_recs > 0 OR p_log_always = 'Y') THEN
       pkg_audit.log_data_change(lv_proc_name,
                                 p_owner,
                                 p_table_name,
+=======
+    LV_COMMENT := 'Log final counts';
+    IF (L_DELETED_RECS > 0 OR P_LOG_ALWAYS = 'Y') THEN
+      PKG_AUDIT.LOG_DATA_CHANGE(LV_PROC_NAME,
+                                P_OWNER,
+                                P_TABLE_NAME,
+>>>>>>> Stashed changes
                                 'Trim',
                                 'D',
-                                l_deleted_recs,
+                                L_DELETED_RECS,
                                 '');
     END IF;
   EXCEPTION
     WHEN OTHERS THEN
+<<<<<<< Updated upstream
       pkg_audit.log_error(lc_svn_id,
                                   lv_proc_name,
                                   lv_comment,
@@ -301,10 +340,22 @@ CREATE OR REPLACE PACKAGE BODY PKG_TRIM_UTILS
                                   SQLCODE,
                                   SQLERRM);
   END trim_small_table;
+=======
+      PKG_AUDIT.LOG_ERROR(LC_SVN_ID,
+                          LV_PROC_NAME,
+                          LV_COMMENT,
+                          P_OWNER || '.' || P_TABLE_NAME,
+                          $$PLSQL_UNIT,
+                          $$PLSQL_LINE,
+                          SQLCODE,
+                          SQLERRM);
+  END TRIM_SMALL_TABLE;
+>>>>>>> Stashed changes
 
-  PROCEDURE trim_par_exec_tasks(p_days PLS_INTEGER DEFAULT 7) IS
-    v_cnt PLS_INTEGER;
+  PROCEDURE TRIM_PAR_EXEC_TASKS(P_DAYS PLS_INTEGER DEFAULT 7) IS
+    V_CNT PLS_INTEGER;
   BEGIN
+<<<<<<< Updated upstream
     lv_proc_name := 'trim_par_exec_tasks';
     SELECT COUNT(DISTINCT task_name)
       INTO v_cnt
@@ -320,16 +371,34 @@ CREATE OR REPLACE PACKAGE BODY PKG_TRIM_UTILS
         sys.dbms_parallel_execute.drop_task(c_rec.task_name);
       END LOOP;
       pkg_audit.log_data_change(lv_proc_name,
+=======
+    LV_PROC_NAME := 'trim_par_exec_tasks';
+    SELECT COUNT(DISTINCT TASK_NAME)
+      INTO V_CNT
+      FROM SYS.DBA_PARALLEL_EXECUTE_CHUNKS
+     WHERE END_TS < SYSDATE - P_DAYS
+       AND TASK_OWNER = USER;
+    IF (V_CNT > 0) THEN
+      PKG_AUDIT.LOG_ACTION(LV_PROC_NAME, 'Trim', 'Keep Days: ' || P_DAYS);
+      FOR C_REC IN (SELECT DISTINCT TASK_NAME
+                      FROM SYS.DBA_PARALLEL_EXECUTE_CHUNKS
+                     WHERE END_TS < SYSDATE - P_DAYS
+                       AND TASK_OWNER = USER) LOOP
+        SYS.DBMS_PARALLEL_EXECUTE.DROP_TASK(C_REC.TASK_NAME);
+      END LOOP;
+      PKG_AUDIT.LOG_DATA_CHANGE(LV_PROC_NAME,
+>>>>>>> Stashed changes
                                 'SYS',
                                 'DBA_PARALLEL_EXECUTE',
                                 'Trim',
                                 'D',
-                                v_cnt,
+                                V_CNT,
                                 'Cleanup of Parallel Execute Tasks older than ' ||
-                                p_days || ' days.');
+                                P_DAYS || ' days.');
     END IF;
   EXCEPTION
     WHEN OTHERS THEN
+<<<<<<< Updated upstream
       pkg_audit.log_error(lc_svn_id,
                                   lv_proc_name,
                                   lv_comment,
@@ -339,16 +408,28 @@ CREATE OR REPLACE PACKAGE BODY PKG_TRIM_UTILS
                                   SQLCODE,
                                   SQLERRM);
   END trim_par_exec_tasks;
+=======
+      PKG_AUDIT.LOG_ERROR(LC_SVN_ID,
+                          LV_PROC_NAME,
+                          LV_COMMENT,
+                          '',
+                          $$PLSQL_UNIT,
+                          $$PLSQL_LINE,
+                          SQLCODE,
+                          SQLERRM);
+  END TRIM_PAR_EXEC_TASKS;
+>>>>>>> Stashed changes
 
   /* Master trim procedures
   These call the other procedures with standard params for each environment
   */
-  PROCEDURE qa_routine_trim IS
+  PROCEDURE QA_ROUTINE_TRIM IS
   BEGIN
-    lv_proc_name := 'qa_routine_trim';
-    trim_par_exec_tasks;
+    LV_PROC_NAME := 'qa_routine_trim';
+    TRIM_PAR_EXEC_TASKS;
   EXCEPTION
     WHEN OTHERS THEN
+<<<<<<< Updated upstream
       pkg_audit.log_error(lc_svn_id,
                                   lv_proc_name,
                                   lv_comment,
@@ -358,13 +439,25 @@ CREATE OR REPLACE PACKAGE BODY PKG_TRIM_UTILS
                                   SQLCODE,
                                   SQLERRM);
   END qa_routine_trim;
+=======
+      PKG_AUDIT.LOG_ERROR(LC_SVN_ID,
+                          LV_PROC_NAME,
+                          LV_COMMENT,
+                          '',
+                          $$PLSQL_UNIT,
+                          $$PLSQL_LINE,
+                          SQLCODE,
+                          SQLERRM);
+  END QA_ROUTINE_TRIM;
+>>>>>>> Stashed changes
 
-  PROCEDURE stage_routine_trim IS
+  PROCEDURE STAGE_ROUTINE_TRIM IS
   BEGIN
-    lv_proc_name := 'stage_routine_trim';
-    trim_par_exec_tasks;
+    LV_PROC_NAME := 'stage_routine_trim';
+    TRIM_PAR_EXEC_TASKS;
   EXCEPTION
     WHEN OTHERS THEN
+<<<<<<< Updated upstream
       pkg_audit.log_error(lc_svn_id,
                                   lv_proc_name,
                                   lv_comment,
@@ -374,13 +467,25 @@ CREATE OR REPLACE PACKAGE BODY PKG_TRIM_UTILS
                                   SQLCODE,
                                   SQLERRM);
   END stage_routine_trim;
+=======
+      PKG_AUDIT.LOG_ERROR(LC_SVN_ID,
+                          LV_PROC_NAME,
+                          LV_COMMENT,
+                          '',
+                          $$PLSQL_UNIT,
+                          $$PLSQL_LINE,
+                          SQLCODE,
+                          SQLERRM);
+  END STAGE_ROUTINE_TRIM;
+>>>>>>> Stashed changes
 
-  PROCEDURE prod_routine_trim IS
+  PROCEDURE PROD_ROUTINE_TRIM IS
   BEGIN
-    lv_proc_name := 'prod_routine_trim';
-    trim_par_exec_tasks;
+    LV_PROC_NAME := 'prod_routine_trim';
+    TRIM_PAR_EXEC_TASKS;
   EXCEPTION
     WHEN OTHERS THEN
+<<<<<<< Updated upstream
       pkg_audit.log_error(lc_svn_id,
                                   lv_proc_name,
                                   lv_comment,
@@ -393,6 +498,19 @@ CREATE OR REPLACE PACKAGE BODY PKG_TRIM_UTILS
 
 BEGIN
   pkg_audit.log_pkg_init($$PLSQL_UNIT, lc_svn_id);
+=======
+      PKG_AUDIT.LOG_ERROR(LC_SVN_ID,
+                          LV_PROC_NAME,
+                          LV_COMMENT,
+                          '',
+                          $$PLSQL_UNIT,
+                          $$PLSQL_LINE,
+                          SQLCODE,
+                          SQLERRM);
+  END PROD_ROUTINE_TRIM;
+
+BEGIN
+  PKG_AUDIT.LOG_PKG_INIT($$PLSQL_UNIT, LC_SVN_ID);
+>>>>>>> Stashed changes
 END PKG_TRIM_UTILS;
 /
-SHOW ERRORS
