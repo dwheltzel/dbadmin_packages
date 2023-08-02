@@ -3,8 +3,8 @@
 
 create table PKG_RUN_LOG_T
 (
-  OWNER            VARCHAR2(30) not null,
-  PACKAGE          VARCHAR2(30) not null,
+  OWNER            VARCHAR2(30) DEFAULT ON NULL USER NOT NULL,
+  PACKAGE          VARCHAR2(30) NOT NULL,
   REVISION         VARCHAR2(30),
   EDITION          VARCHAR2(30),
   SOURCE_FILE      VARCHAR2(30),
