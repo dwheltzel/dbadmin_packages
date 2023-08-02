@@ -1,8 +1,6 @@
 SET DEFINE OFF
 
-CREATE OR REPLACE PACKAGE audit_pkg IS
-
-  -- File audit_pkg_spec.sql
+CREATE OR REPLACE PACKAGE PKG_AUDIT IS
   -- Author: dheltzel
   PROCEDURE test_harness_log_error;
 
@@ -50,6 +48,6 @@ CREATE OR REPLACE PACKAGE audit_pkg IS
 
   PROCEDURE log_pkg_init(p_package VARCHAR2, p_svn_id VARCHAR2);
 
-END audit_pkg;
+END PKG_AUDIT;
 /
 SHOW ERRORS

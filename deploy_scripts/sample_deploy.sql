@@ -1,4 +1,3 @@
--- create_registry.sql
 -- Author: dheltzel
 
 --BEGIN

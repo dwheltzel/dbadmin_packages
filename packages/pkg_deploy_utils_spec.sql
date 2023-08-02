@@ -1,7 +1,6 @@
 SET DEFINE OFF
 
-CREATE OR REPLACE PACKAGE deploy_utils
--- File deploy_utils_spec.sql
+CREATE OR REPLACE PACKAGE PKG_DEPLOY_UTILS
 -- Author: dheltzel
 AUTHID CURRENT_USER AS
 
@@ -175,6 +174,6 @@ AUTHID CURRENT_USER AS
                               p_table_name  VARCHAR,
                               force         BOOLEAN DEFAULT FALSE);
 
-END deploy_utils;
+END PKG_DEPLOY_UTILS;
 /
 SHOW ERRORS

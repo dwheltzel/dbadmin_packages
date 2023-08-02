@@ -1,7 +1,6 @@
 SET DEFINE OFF
 
-CREATE OR REPLACE PACKAGE BODY trim_utils
--- File trim_utils_body.sql
+CREATE OR REPLACE PACKAGE BODY PKG_TRIM_UTILS
 -- Author: dheltzel
  AS
 
@@ -394,6 +393,6 @@ CREATE OR REPLACE PACKAGE BODY trim_utils
 
 BEGIN
   audit_pkg.log_pkg_init($$PLSQL_UNIT, lc_svn_id);
-END trim_utils;
+END PKG_TRIM_UTILS;
 /
 SHOW ERRORS

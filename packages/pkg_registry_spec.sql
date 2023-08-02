@@ -1,8 +1,6 @@
 SET DEFINE OFF
 
-CREATE OR REPLACE PACKAGE registry IS
-
-  -- File registry_spec.sql
+CREATE OR REPLACE PACKAGE PKG_REGISTRY IS
   -- Author: dheltzel
   /*  Purpose : Provide generic but flexible access to key-values pairs
   
@@ -54,6 +52,6 @@ CREATE OR REPLACE PACKAGE registry IS
                         p_namespace VARCHAR2 DEFAULT NULL,
                         p_envir     VARCHAR2 DEFAULT NULL);
 
-END registry;
+END PKG_REGISTRY;
 /
 SHOW ERRORS

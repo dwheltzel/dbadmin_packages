@@ -1,8 +1,6 @@
 SET DEFINE OFF
 
-CREATE OR REPLACE PACKAGE BODY registry IS
-
-  -- File registry_body.sql
+CREATE OR REPLACE PACKAGE BODY PKG_REGISTRY IS
   -- Author: dheltzel
   lc_svn_id VARCHAR2(200) := 'registry_body.sql dheltzel';
 
@@ -266,6 +264,6 @@ CREATE OR REPLACE PACKAGE BODY registry IS
 
 BEGIN
   audit_pkg.log_pkg_init($$PLSQL_UNIT, lc_svn_id);
-END registry;
+END PKG_REGISTRY;
 /
 SHOW ERRORS

@@ -1,7 +1,6 @@
 SET DEFINE OFF
 
-CREATE OR REPLACE PACKAGE trim_utils
--- File trim_utils_spec.sql
+CREATE OR REPLACE PACKAGE PKG_TRIM_UTILS
 -- Author: dheltzel
 AUTHID CURRENT_USER AS
 
@@ -38,6 +37,6 @@ AUTHID CURRENT_USER AS
 
   PROCEDURE prod_routine_trim;
 
-END trim_utils;
+END PKG_TRIM_UTILS;
 /
 SHOW ERRORS

@@ -1,10 +1,10 @@
 -- drop_base.sql
 -- Author: dheltzel
 
-drop package TRIM_UTILS;
-drop package REGISTRY;
-drop package AUDIT_PKG;
-drop package DEPLOY_UTILS;
+drop package PKG_TRIM_UTILS;
+drop package PKG_REGISTRY;
+drop package PKG_AUDIT;
+drop package PKG_DEPLOY_UTILS;
 drop view ACTION_AUDIT_LOG;
 drop view CUSTOM_EXCEPT_HANDLING;
 drop view DATA_AUDIT_LOG;
