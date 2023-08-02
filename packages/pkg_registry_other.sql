@@ -1,3 +1,3 @@
 -- Author: dheltzel
 
-exec pkg_deploy_utils.synonyms_grants('ADMIN', 'REGISTRY', 'PACKAGE')
+GRANT EXECUTE ON PKG_REGISTRY TO PUBLIC;

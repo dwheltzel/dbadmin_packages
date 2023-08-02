@@ -24,7 +24,8 @@ GRANT SELECT ON sys.dba_parallel_execute_chunks TO &&1;
 --GRANT SELECT ON sys.dba_roles TO &&1;
 GRANT SELECT ON sys.dba_scheduler_jobs TO &&1;
 --GRANT SELECT ON sys.gv_$session TO &&1;
---GRANT EXECUTE ON sys.dbms_lock TO &&1;
+GRANT SELECT ON sys.dba_tab_subpartitions TO &&1;
+GRANT SELECT ON sys.dba_tab_partitions TO &&1;
 
 -- Create tables
 PROMPT pkg_run_log.sql
@@ -61,8 +62,6 @@ BEGIN pkg_deploy_utils.pkg_info; END;
 -- Create extra packages
 PROMPT pkg_trim_utils_spec.sql
 @packages/pkg_trim_utils_spec.sql
-PROMPT pkg_trim_utils_other.sql
-@packages/pkg_trim_utils_other.sql &&1
 PROMPT pkg_trim_utils_body.sql
 @packages/pkg_trim_utils_body.sql
 PROMPT pkg_registry_spec.sql
