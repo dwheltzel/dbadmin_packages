@@ -8,7 +8,7 @@ SET pages 0
 SET trimspool ON
 COL spool_name FOR a40 new_value spool_name
 SELECT 'InstallDeployUtils_'||db_unique_name||'_'||to_char(SYSDATE,'YYMMDDHH24MI')||'.sql' spool_name from v$database;
-SPOOL /home/oracle/logs/&spool_name
+SPOOL &spool_name
 
 --ALTER USER dbadmin DEFAULT ROLE ALL;
 --GRANT SELECT ON sys.dba_editions TO dbadmin;
