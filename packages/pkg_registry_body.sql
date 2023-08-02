@@ -1,269 +1,264 @@
-SET DEFINE OFF
-
-CREATE OR REPLACE PACKAGE BODY PKG_REGISTRY IS
+CREATE OR REPLACE PACKAGE BODY COMSPOC_DBA.PKG_REGISTRY IS
   -- Author: dheltzel
-  lc_svn_id VARCHAR2(200) := 'registry_body.sql dheltzel';
+  LC_SVN_ID VARCHAR2(200) := 'registry_body.sql dheltzel';
 
-  lv_proc_name err_log.proc_name%TYPE;
+  LV_PROC_NAME ERR_LOG.PROC_NAME%TYPE;
 
-  lv_comment err_log.source_file%TYPE := 'Starting';
+  LV_COMMENT ERR_LOG.SOURCE_FILE%TYPE := 'Starting';
 
-  pkg_namespace registrytable.namespace%TYPE := 'DEFAULT';
+  PKG_NAMESPACE REGISTRYTABLE.NAMESPACE%TYPE := 'DEFAULT';
 
-  pkg_envir registrytable.envir%TYPE := 'A';
+  PKG_ENVIR REGISTRYTABLE.ENVIR%TYPE := 'A';
 
-  FUNCTION get_namespace RETURN VARCHAR2 IS
+  FUNCTION GET_NAMESPACE RETURN VARCHAR2 IS
   BEGIN
-    lv_proc_name := 'get_namespace';
-    RETURN(pkg_namespace);
+    LV_PROC_NAME := 'get_namespace';
+    RETURN(PKG_NAMESPACE);
   EXCEPTION
     WHEN OTHERS THEN
-      pkg_audit.log_error(lc_svn_id,
-                                lv_proc_name,
-                                lv_comment,
-                                pkg_namespace,
-                                $$PLSQL_UNIT,
-                                $$PLSQL_LINE,
-                                SQLCODE,
-                                SQLERRM);
-  END get_namespace;
+      PKG_AUDIT.LOG_ERROR(LC_SVN_ID,
+                          LV_PROC_NAME,
+                          LV_COMMENT,
+                          PKG_NAMESPACE,
+                          $$PLSQL_UNIT,
+                          $$PLSQL_LINE,
+                          SQLCODE,
+                          SQLERRM);
+  END GET_NAMESPACE;
 
-  PROCEDURE set_namespace(p_namespace VARCHAR2) IS
+  PROCEDURE SET_NAMESPACE(P_NAMESPACE VARCHAR2) IS
   BEGIN
-    lv_proc_name  := 'set_namespace';
-    pkg_namespace := p_namespace;
+    LV_PROC_NAME  := 'set_namespace';
+    PKG_NAMESPACE := P_NAMESPACE;
   EXCEPTION
     WHEN OTHERS THEN
-      pkg_audit.log_error(lc_svn_id,
-                                lv_proc_name,
-                                lv_comment,
-                                p_namespace,
-                                $$PLSQL_UNIT,
-                                $$PLSQL_LINE,
-                                SQLCODE,
-                                SQLERRM);
-  END set_namespace;
+      PKG_AUDIT.LOG_ERROR(LC_SVN_ID,
+                          LV_PROC_NAME,
+                          LV_COMMENT,
+                          P_NAMESPACE,
+                          $$PLSQL_UNIT,
+                          $$PLSQL_LINE,
+                          SQLCODE,
+                          SQLERRM);
+  END SET_NAMESPACE;
 
-  PROCEDURE clear_namespace IS
+  PROCEDURE CLEAR_NAMESPACE IS
   BEGIN
-    lv_proc_name  := 'clear_namespace';
-    pkg_namespace := 'DEFAULT';
+    LV_PROC_NAME  := 'clear_namespace';
+    PKG_NAMESPACE := 'DEFAULT';
   EXCEPTION
     WHEN OTHERS THEN
-      pkg_audit.log_error(lc_svn_id,
-                                lv_proc_name,
-                                lv_comment,
-                                pkg_namespace,
-                                $$PLSQL_UNIT,
-                                $$PLSQL_LINE,
-                                SQLCODE,
-                                SQLERRM);
-  END clear_namespace;
+      PKG_AUDIT.LOG_ERROR(LC_SVN_ID,
+                          LV_PROC_NAME,
+                          LV_COMMENT,
+                          PKG_NAMESPACE,
+                          $$PLSQL_UNIT,
+                          $$PLSQL_LINE,
+                          SQLCODE,
+                          SQLERRM);
+  END CLEAR_NAMESPACE;
 
-  FUNCTION get_environment RETURN VARCHAR2 IS
+  FUNCTION GET_ENVIRONMENT RETURN VARCHAR2 IS
   BEGIN
-    lv_proc_name := 'get_environment';
-    RETURN(pkg_envir);
+    LV_PROC_NAME := 'get_environment';
+    RETURN(PKG_ENVIR);
   EXCEPTION
     WHEN OTHERS THEN
-      pkg_audit.log_error(lc_svn_id,
-                                lv_proc_name,
-                                lv_comment,
-                                pkg_envir,
-                                $$PLSQL_UNIT,
-                                $$PLSQL_LINE,
-                                SQLCODE,
-                                SQLERRM);
-  END get_environment;
+      PKG_AUDIT.LOG_ERROR(LC_SVN_ID,
+                          LV_PROC_NAME,
+                          LV_COMMENT,
+                          PKG_ENVIR,
+                          $$PLSQL_UNIT,
+                          $$PLSQL_LINE,
+                          SQLCODE,
+                          SQLERRM);
+  END GET_ENVIRONMENT;
 
-  PROCEDURE set_environment(p_envir VARCHAR2) IS
+  PROCEDURE SET_ENVIRONMENT(P_ENVIR VARCHAR2) IS
   BEGIN
-    lv_proc_name := 'set_environment';
-    pkg_envir    := p_envir;
+    LV_PROC_NAME := 'set_environment';
+    PKG_ENVIR    := P_ENVIR;
   EXCEPTION
     WHEN OTHERS THEN
-      pkg_audit.log_error(lc_svn_id,
-                                lv_proc_name,
-                                lv_comment,
-                                pkg_envir,
-                                $$PLSQL_UNIT,
-                                $$PLSQL_LINE,
-                                SQLCODE,
-                                SQLERRM);
-  END set_environment;
+      PKG_AUDIT.LOG_ERROR(LC_SVN_ID,
+                          LV_PROC_NAME,
+                          LV_COMMENT,
+                          PKG_ENVIR,
+                          $$PLSQL_UNIT,
+                          $$PLSQL_LINE,
+                          SQLCODE,
+                          SQLERRM);
+  END SET_ENVIRONMENT;
 
-  PROCEDURE clear_environment IS
+  PROCEDURE CLEAR_ENVIRONMENT IS
   BEGIN
-    lv_proc_name := 'clear_environment';
-    pkg_envir    := 'A';
+    LV_PROC_NAME := 'clear_environment';
+    PKG_ENVIR    := 'A';
   EXCEPTION
     WHEN OTHERS THEN
-      pkg_audit.log_error(lc_svn_id,
-                                lv_proc_name,
-                                lv_comment,
-                                pkg_envir,
-                                $$PLSQL_UNIT,
-                                $$PLSQL_LINE,
-                                SQLCODE,
-                                SQLERRM);
-  END clear_environment;
+      PKG_AUDIT.LOG_ERROR(LC_SVN_ID,
+                          LV_PROC_NAME,
+                          LV_COMMENT,
+                          PKG_ENVIR,
+                          $$PLSQL_UNIT,
+                          $$PLSQL_LINE,
+                          SQLCODE,
+                          SQLERRM);
+  END CLEAR_ENVIRONMENT;
 
-  FUNCTION get_value(p_name      VARCHAR2,
-                     p_namespace VARCHAR2 DEFAULT NULL,
-                     p_envir     VARCHAR2 DEFAULT NULL,
-                     p_default   VARCHAR2 DEFAULT NULL) RETURN VARCHAR2 IS
+  FUNCTION GET_VALUE(P_NAME      VARCHAR2,
+                     P_NAMESPACE VARCHAR2 DEFAULT NULL,
+                     P_ENVIR     VARCHAR2 DEFAULT NULL,
+                     P_DEFAULT   VARCHAR2 DEFAULT NULL) RETURN VARCHAR2 IS
     RESULT      VARCHAR2(4000);
-    l_namespace registrytable.namespace%TYPE := nvl(p_namespace,
-                                                    pkg_namespace);
-    l_envir     registrytable.envir%TYPE := nvl(p_envir, pkg_envir);
+    L_NAMESPACE REGISTRYTABLE.NAMESPACE%TYPE := NVL(P_NAMESPACE,
+                                                    PKG_NAMESPACE);
+    L_ENVIR     REGISTRYTABLE.ENVIR%TYPE := NVL(P_ENVIR, PKG_ENVIR);
   BEGIN
-    lv_proc_name := 'get_value';
+    LV_PROC_NAME := 'get_value';
     -- Select the value with an aggregate function so it returns NULL on no records found
     -- and allows an override to the passed in default if null or not found
-    SELECT nvl(MAX(VALUE), p_default)
+    SELECT NVL(MAX(VALUE), P_DEFAULT)
       INTO RESULT
-      FROM registrytable
-     WHERE namespace = l_namespace
-       AND envir = l_envir
-       AND NAME = p_name;
+      FROM REGISTRYTABLE
+     WHERE NAMESPACE = L_NAMESPACE
+       AND ENVIR = L_ENVIR
+       AND NAME = P_NAME;
     RETURN(RESULT);
   EXCEPTION
     WHEN OTHERS THEN
-      pkg_audit.log_error(lc_svn_id,
-                                lv_proc_name,
-                                lv_comment,
-                                p_name || ' ' || p_namespace || ' ' ||
-                                p_envir,
-                                $$PLSQL_UNIT,
-                                $$PLSQL_LINE,
-                                SQLCODE,
-                                SQLERRM);
-  END get_value;
+      PKG_AUDIT.LOG_ERROR(LC_SVN_ID,
+                          LV_PROC_NAME,
+                          LV_COMMENT,
+                          P_NAME || ' ' || P_NAMESPACE || ' ' || P_ENVIR,
+                          $$PLSQL_UNIT,
+                          $$PLSQL_LINE,
+                          SQLCODE,
+                          SQLERRM);
+  END GET_VALUE;
 
-  FUNCTION insert_value(p_name      VARCHAR2,
-                        p_value     VARCHAR2,
-                        p_namespace VARCHAR2 DEFAULT NULL,
-                        p_envir     VARCHAR2 DEFAULT NULL,
-                        p_immutable VARCHAR2 DEFAULT 'N') RETURN BOOLEAN IS
+  FUNCTION INSERT_VALUE(P_NAME      VARCHAR2,
+                        P_VALUE     VARCHAR2,
+                        P_NAMESPACE VARCHAR2 DEFAULT NULL,
+                        P_ENVIR     VARCHAR2 DEFAULT NULL,
+                        P_IMMUTABLE VARCHAR2 DEFAULT 'N') RETURN BOOLEAN IS
     PRAGMA AUTONOMOUS_TRANSACTION;
-    l_namespace registrytable.namespace%TYPE := nvl(p_namespace,
-                                                    pkg_namespace);
-    l_envir     registrytable.envir%TYPE := nvl(p_envir, pkg_envir);
+    L_NAMESPACE REGISTRYTABLE.NAMESPACE%TYPE := NVL(P_NAMESPACE,
+                                                    PKG_NAMESPACE);
+    L_ENVIR     REGISTRYTABLE.ENVIR%TYPE := NVL(P_ENVIR, PKG_ENVIR);
   BEGIN
-    lv_proc_name := 'insert_value';
-    INSERT INTO registrytable
-      (namespace, envir, NAME, immutable, VALUE)
+    LV_PROC_NAME := 'insert_value';
+    INSERT INTO REGISTRYTABLE
+      (NAMESPACE, ENVIR, NAME, IMMUTABLE, VALUE)
     VALUES
-      (l_namespace, l_envir, p_name, p_immutable, p_value);
+      (L_NAMESPACE, L_ENVIR, P_NAME, P_IMMUTABLE, P_VALUE);
     RETURN TRUE;
   EXCEPTION
-    WHEN dup_val_on_index THEN
+    WHEN DUP_VAL_ON_INDEX THEN
       RETURN FALSE;
     WHEN OTHERS THEN
-      pkg_audit.log_error(lc_svn_id,
-                                lv_proc_name,
-                                lv_comment,
-                                p_name || ' ' || p_value || ' ' ||
-                                p_namespace || ' ' || p_envir,
-                                $$PLSQL_UNIT,
-                                $$PLSQL_LINE,
-                                SQLCODE,
-                                SQLERRM);
-  END insert_value;
+      PKG_AUDIT.LOG_ERROR(LC_SVN_ID,
+                          LV_PROC_NAME,
+                          LV_COMMENT,
+                          P_NAME || ' ' || P_VALUE || ' ' || P_NAMESPACE || ' ' ||
+                          P_ENVIR,
+                          $$PLSQL_UNIT,
+                          $$PLSQL_LINE,
+                          SQLCODE,
+                          SQLERRM);
+  END INSERT_VALUE;
 
-  FUNCTION update_value(p_name      VARCHAR2,
-                        p_value     VARCHAR2,
-                        p_namespace VARCHAR2 DEFAULT NULL,
-                        p_envir     VARCHAR2 DEFAULT NULL) RETURN INTEGER IS
+  FUNCTION UPDATE_VALUE(P_NAME      VARCHAR2,
+                        P_VALUE     VARCHAR2,
+                        P_NAMESPACE VARCHAR2 DEFAULT NULL,
+                        P_ENVIR     VARCHAR2 DEFAULT NULL) RETURN INTEGER IS
     PRAGMA AUTONOMOUS_TRANSACTION;
-    l_namespace registrytable.namespace%TYPE := nvl(p_namespace,
-                                                    pkg_namespace);
-    l_envir     registrytable.envir%TYPE := nvl(p_envir, pkg_envir);
+    L_NAMESPACE REGISTRYTABLE.NAMESPACE%TYPE := NVL(P_NAMESPACE,
+                                                    PKG_NAMESPACE);
+    L_ENVIR     REGISTRYTABLE.ENVIR%TYPE := NVL(P_ENVIR, PKG_ENVIR);
   BEGIN
-    lv_proc_name := 'update_value';
-    UPDATE registrytable
-       SET VALUE = p_value
-     WHERE namespace = l_namespace
-       AND envir = l_envir
-       AND NAME = p_name
-       AND immutable = 'N';
+    LV_PROC_NAME := 'update_value';
+    UPDATE REGISTRYTABLE
+       SET VALUE = P_VALUE
+     WHERE NAMESPACE = L_NAMESPACE
+       AND ENVIR = L_ENVIR
+       AND NAME = P_NAME
+       AND IMMUTABLE = 'N';
     RETURN SQL%ROWCOUNT;
   EXCEPTION
     WHEN OTHERS THEN
-      pkg_audit.log_error(lc_svn_id,
-                                lv_proc_name,
-                                lv_comment,
-                                p_name || ' ' || p_value || ' ' ||
-                                p_namespace || ' ' || p_envir,
-                                $$PLSQL_UNIT,
-                                $$PLSQL_LINE,
-                                SQLCODE,
-                                SQLERRM);
-  END update_value;
+      PKG_AUDIT.LOG_ERROR(LC_SVN_ID,
+                          LV_PROC_NAME,
+                          LV_COMMENT,
+                          P_NAME || ' ' || P_VALUE || ' ' || P_NAMESPACE || ' ' ||
+                          P_ENVIR,
+                          $$PLSQL_UNIT,
+                          $$PLSQL_LINE,
+                          SQLCODE,
+                          SQLERRM);
+  END UPDATE_VALUE;
 
-  PROCEDURE set_value(p_name      VARCHAR2,
-                      p_value     VARCHAR2,
-                      p_namespace VARCHAR2 DEFAULT NULL,
-                      p_envir     VARCHAR2 DEFAULT NULL) IS
-    l_return BOOLEAN;
+  PROCEDURE SET_VALUE(P_NAME      VARCHAR2,
+                      P_VALUE     VARCHAR2,
+                      P_NAMESPACE VARCHAR2 DEFAULT NULL,
+                      P_ENVIR     VARCHAR2 DEFAULT NULL) IS
+    L_RETURN BOOLEAN;
   BEGIN
-    lv_proc_name := 'set_value';
-    IF (update_value(p_name, p_value, p_namespace, p_envir) = 0) THEN
-      l_return := insert_value(p_name, p_value, p_namespace, p_envir);
+    LV_PROC_NAME := 'set_value';
+    IF (UPDATE_VALUE(P_NAME, P_VALUE, P_NAMESPACE, P_ENVIR) = 0) THEN
+      L_RETURN := INSERT_VALUE(P_NAME, P_VALUE, P_NAMESPACE, P_ENVIR);
     END IF;
-    IF NOT l_return THEN
-      pkg_audit.log_error(lc_svn_id,
-                                lv_proc_name,
-                                'update failed',
-                                p_name || ' ' || p_value || ' ' ||
-                                p_namespace || ' ' || p_envir,
-                                $$PLSQL_UNIT,
-                                $$PLSQL_LINE,
-                                SQLCODE,
-                                SQLERRM);
+    IF NOT L_RETURN THEN
+      PKG_AUDIT.LOG_ERROR(LC_SVN_ID,
+                          LV_PROC_NAME,
+                          'update failed',
+                          P_NAME || ' ' || P_VALUE || ' ' || P_NAMESPACE || ' ' ||
+                          P_ENVIR,
+                          $$PLSQL_UNIT,
+                          $$PLSQL_LINE,
+                          SQLCODE,
+                          SQLERRM);
     END IF;
   EXCEPTION
     WHEN OTHERS THEN
-      pkg_audit.log_error(lc_svn_id,
-                                lv_proc_name,
-                                lv_comment,
-                                p_name || ' ' || p_value || ' ' ||
-                                p_namespace || ' ' || p_envir,
-                                $$PLSQL_UNIT,
-                                $$PLSQL_LINE,
-                                SQLCODE,
-                                SQLERRM);
-  END set_value;
+      PKG_AUDIT.LOG_ERROR(LC_SVN_ID,
+                          LV_PROC_NAME,
+                          LV_COMMENT,
+                          P_NAME || ' ' || P_VALUE || ' ' || P_NAMESPACE || ' ' ||
+                          P_ENVIR,
+                          $$PLSQL_UNIT,
+                          $$PLSQL_LINE,
+                          SQLCODE,
+                          SQLERRM);
+  END SET_VALUE;
 
-  PROCEDURE clear_value(p_name      VARCHAR2,
-                        p_namespace VARCHAR2 DEFAULT NULL,
-                        p_envir     VARCHAR2 DEFAULT NULL) IS
+  PROCEDURE CLEAR_VALUE(P_NAME      VARCHAR2,
+                        P_NAMESPACE VARCHAR2 DEFAULT NULL,
+                        P_ENVIR     VARCHAR2 DEFAULT NULL) IS
     PRAGMA AUTONOMOUS_TRANSACTION;
-    l_namespace registrytable.namespace%TYPE := nvl(p_namespace,
-                                                    pkg_namespace);
-    l_envir     registrytable.envir%TYPE := nvl(p_envir, pkg_envir);
+    L_NAMESPACE REGISTRYTABLE.NAMESPACE%TYPE := NVL(P_NAMESPACE,
+                                                    PKG_NAMESPACE);
+    L_ENVIR     REGISTRYTABLE.ENVIR%TYPE := NVL(P_ENVIR, PKG_ENVIR);
   BEGIN
-    lv_proc_name := 'clear_value';
-    DELETE FROM registrytable
-     WHERE namespace = l_namespace
-       AND envir = l_envir
-       AND NAME = p_name
-       AND immutable = 'N';
+    LV_PROC_NAME := 'clear_value';
+    DELETE FROM REGISTRYTABLE
+     WHERE NAMESPACE = L_NAMESPACE
+       AND ENVIR = L_ENVIR
+       AND NAME = P_NAME
+       AND IMMUTABLE = 'N';
   EXCEPTION
     WHEN OTHERS THEN
-      pkg_audit.log_error(lc_svn_id,
-                                lv_proc_name,
-                                lv_comment,
-                                p_name || ' ' || p_namespace || ' ' ||
-                                p_envir,
-                                $$PLSQL_UNIT,
-                                $$PLSQL_LINE,
-                                SQLCODE,
-                                SQLERRM);
-  END clear_value;
+      PKG_AUDIT.LOG_ERROR(LC_SVN_ID,
+                          LV_PROC_NAME,
+                          LV_COMMENT,
+                          P_NAME || ' ' || P_NAMESPACE || ' ' || P_ENVIR,
+                          $$PLSQL_UNIT,
+                          $$PLSQL_LINE,
+                          SQLCODE,
+                          SQLERRM);
+  END CLEAR_VALUE;
 
 BEGIN
-  pkg_audit.log_pkg_init($$PLSQL_UNIT, lc_svn_id);
+  PKG_AUDIT.LOG_PKG_INIT($$PLSQL_UNIT, LC_SVN_ID);
 END PKG_REGISTRY;
 /
-SHOW ERRORS

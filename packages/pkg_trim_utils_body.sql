@@ -72,17 +72,6 @@ CREATE OR REPLACE PACKAGE BODY COMSPOC_DBA.PKG_TRIM_UTILS
     END LOOP;
   EXCEPTION
     WHEN OTHERS THEN
-<<<<<<< Updated upstream
-      pkg_audit.log_error(lc_svn_id,
-                                  lv_proc_name,
-                                  lv_comment,
-                                  'WEBAPI.API_REQUEST_LOG_',
-                                  $$PLSQL_UNIT,
-                                  $$PLSQL_LINE,
-                                  SQLCODE,
-                                  SQLERRM);
-  END part_rename_api_request_log;
-=======
       PKG_AUDIT.LOG_ERROR(LC_SVN_ID,
                           LV_PROC_NAME,
                           LV_COMMENT,
@@ -92,7 +81,6 @@ CREATE OR REPLACE PACKAGE BODY COMSPOC_DBA.PKG_TRIM_UTILS
                           SQLCODE,
                           SQLERRM);
   END PART_RENAME_API_REQUEST_LOG;
->>>>>>> Stashed changes
 
   FUNCTION CHK_SETTINGS(VAR_NAME IN VARCHAR2) RETURN VARCHAR2 IS
     RESULT VARCHAR2(100);
@@ -250,19 +238,11 @@ CREATE OR REPLACE PACKAGE BODY COMSPOC_DBA.PKG_TRIM_UTILS
       END IF;
     END LOOP;
     COMMIT;
-<<<<<<< Updated upstream
-    lv_comment := 'Log final counts';
-    IF (l_deleted_recs > 0 OR p_log_always = 'Y') THEN
-      pkg_audit.log_data_change(lv_proc_name,
-                                p_owner,
-                                p_table_name,
-=======
     LV_COMMENT := 'Log final counts';
     IF (L_DELETED_RECS > 0 OR P_LOG_ALWAYS = 'Y') THEN
       PKG_AUDIT.LOG_DATA_CHANGE(LV_PROC_NAME,
                                 P_OWNER,
                                 P_TABLE_NAME,
->>>>>>> Stashed changes
                                 'Trim',
                                 'D',
                                 L_DELETED_RECS,
@@ -273,17 +253,6 @@ CREATE OR REPLACE PACKAGE BODY COMSPOC_DBA.PKG_TRIM_UTILS
     dbms_output.put_line('Total checkpoints: ' || l_chkpnt_count);*/
   EXCEPTION
     WHEN OTHERS THEN
-<<<<<<< Updated upstream
-      pkg_audit.log_error(lc_svn_id,
-                                  lv_proc_name,
-                                  lv_comment,
-                                  p_owner || '.' || p_table_name,
-                                  $$PLSQL_UNIT,
-                                  $$PLSQL_LINE,
-                                  SQLCODE,
-                                  SQLERRM);
-  END trim_large_table;
-=======
       PKG_AUDIT.LOG_ERROR(LC_SVN_ID,
                           LV_PROC_NAME,
                           LV_COMMENT,
@@ -293,7 +262,6 @@ CREATE OR REPLACE PACKAGE BODY COMSPOC_DBA.PKG_TRIM_UTILS
                           SQLCODE,
                           SQLERRM);
   END TRIM_LARGE_TABLE;
->>>>>>> Stashed changes
 
   -- Generic proc to delete records from a small table
   PROCEDURE TRIM_SMALL_TABLE(P_OWNER      VARCHAR2,
@@ -310,19 +278,11 @@ CREATE OR REPLACE PACKAGE BODY COMSPOC_DBA.PKG_TRIM_UTILS
     EXECUTE IMMEDIATE P_SQL;
     L_DELETED_RECS := SQL%ROWCOUNT;
     COMMIT;
-<<<<<<< Updated upstream
-    lv_comment := 'Log final counts';
-    IF (l_deleted_recs > 0 OR p_log_always = 'Y') THEN
-      pkg_audit.log_data_change(lv_proc_name,
-                                p_owner,
-                                p_table_name,
-=======
     LV_COMMENT := 'Log final counts';
     IF (L_DELETED_RECS > 0 OR P_LOG_ALWAYS = 'Y') THEN
       PKG_AUDIT.LOG_DATA_CHANGE(LV_PROC_NAME,
                                 P_OWNER,
                                 P_TABLE_NAME,
->>>>>>> Stashed changes
                                 'Trim',
                                 'D',
                                 L_DELETED_RECS,
@@ -330,17 +290,6 @@ CREATE OR REPLACE PACKAGE BODY COMSPOC_DBA.PKG_TRIM_UTILS
     END IF;
   EXCEPTION
     WHEN OTHERS THEN
-<<<<<<< Updated upstream
-      pkg_audit.log_error(lc_svn_id,
-                                  lv_proc_name,
-                                  lv_comment,
-                                  p_owner || '.' || p_table_name,
-                                  $$PLSQL_UNIT,
-                                  $$PLSQL_LINE,
-                                  SQLCODE,
-                                  SQLERRM);
-  END trim_small_table;
-=======
       PKG_AUDIT.LOG_ERROR(LC_SVN_ID,
                           LV_PROC_NAME,
                           LV_COMMENT,
@@ -350,28 +299,10 @@ CREATE OR REPLACE PACKAGE BODY COMSPOC_DBA.PKG_TRIM_UTILS
                           SQLCODE,
                           SQLERRM);
   END TRIM_SMALL_TABLE;
->>>>>>> Stashed changes
 
   PROCEDURE TRIM_PAR_EXEC_TASKS(P_DAYS PLS_INTEGER DEFAULT 7) IS
     V_CNT PLS_INTEGER;
   BEGIN
-<<<<<<< Updated upstream
-    lv_proc_name := 'trim_par_exec_tasks';
-    SELECT COUNT(DISTINCT task_name)
-      INTO v_cnt
-      FROM sys.dba_parallel_execute_chunks
-     WHERE end_ts < SYSDATE - p_days
-       AND task_owner = USER;
-    IF (v_cnt > 0) THEN
-      pkg_audit.log_action(lv_proc_name, 'Trim', 'Keep Days: ' || p_days);
-      FOR c_rec IN (SELECT DISTINCT task_name
-                      FROM sys.dba_parallel_execute_chunks
-                     WHERE end_ts < SYSDATE - p_days
-                       AND task_owner = USER) LOOP
-        sys.dbms_parallel_execute.drop_task(c_rec.task_name);
-      END LOOP;
-      pkg_audit.log_data_change(lv_proc_name,
-=======
     LV_PROC_NAME := 'trim_par_exec_tasks';
     SELECT COUNT(DISTINCT TASK_NAME)
       INTO V_CNT
@@ -387,7 +318,6 @@ CREATE OR REPLACE PACKAGE BODY COMSPOC_DBA.PKG_TRIM_UTILS
         SYS.DBMS_PARALLEL_EXECUTE.DROP_TASK(C_REC.TASK_NAME);
       END LOOP;
       PKG_AUDIT.LOG_DATA_CHANGE(LV_PROC_NAME,
->>>>>>> Stashed changes
                                 'SYS',
                                 'DBA_PARALLEL_EXECUTE',
                                 'Trim',
@@ -398,17 +328,6 @@ CREATE OR REPLACE PACKAGE BODY COMSPOC_DBA.PKG_TRIM_UTILS
     END IF;
   EXCEPTION
     WHEN OTHERS THEN
-<<<<<<< Updated upstream
-      pkg_audit.log_error(lc_svn_id,
-                                  lv_proc_name,
-                                  lv_comment,
-                                  '',
-                                  $$PLSQL_UNIT,
-                                  $$PLSQL_LINE,
-                                  SQLCODE,
-                                  SQLERRM);
-  END trim_par_exec_tasks;
-=======
       PKG_AUDIT.LOG_ERROR(LC_SVN_ID,
                           LV_PROC_NAME,
                           LV_COMMENT,
@@ -418,7 +337,6 @@ CREATE OR REPLACE PACKAGE BODY COMSPOC_DBA.PKG_TRIM_UTILS
                           SQLCODE,
                           SQLERRM);
   END TRIM_PAR_EXEC_TASKS;
->>>>>>> Stashed changes
 
   /* Master trim procedures
   These call the other procedures with standard params for each environment
@@ -429,17 +347,6 @@ CREATE OR REPLACE PACKAGE BODY COMSPOC_DBA.PKG_TRIM_UTILS
     TRIM_PAR_EXEC_TASKS;
   EXCEPTION
     WHEN OTHERS THEN
-<<<<<<< Updated upstream
-      pkg_audit.log_error(lc_svn_id,
-                                  lv_proc_name,
-                                  lv_comment,
-                                  '',
-                                  $$PLSQL_UNIT,
-                                  $$PLSQL_LINE,
-                                  SQLCODE,
-                                  SQLERRM);
-  END qa_routine_trim;
-=======
       PKG_AUDIT.LOG_ERROR(LC_SVN_ID,
                           LV_PROC_NAME,
                           LV_COMMENT,
@@ -449,7 +356,6 @@ CREATE OR REPLACE PACKAGE BODY COMSPOC_DBA.PKG_TRIM_UTILS
                           SQLCODE,
                           SQLERRM);
   END QA_ROUTINE_TRIM;
->>>>>>> Stashed changes
 
   PROCEDURE STAGE_ROUTINE_TRIM IS
   BEGIN
@@ -457,17 +363,6 @@ CREATE OR REPLACE PACKAGE BODY COMSPOC_DBA.PKG_TRIM_UTILS
     TRIM_PAR_EXEC_TASKS;
   EXCEPTION
     WHEN OTHERS THEN
-<<<<<<< Updated upstream
-      pkg_audit.log_error(lc_svn_id,
-                                  lv_proc_name,
-                                  lv_comment,
-                                  '',
-                                  $$PLSQL_UNIT,
-                                  $$PLSQL_LINE,
-                                  SQLCODE,
-                                  SQLERRM);
-  END stage_routine_trim;
-=======
       PKG_AUDIT.LOG_ERROR(LC_SVN_ID,
                           LV_PROC_NAME,
                           LV_COMMENT,
@@ -477,7 +372,6 @@ CREATE OR REPLACE PACKAGE BODY COMSPOC_DBA.PKG_TRIM_UTILS
                           SQLCODE,
                           SQLERRM);
   END STAGE_ROUTINE_TRIM;
->>>>>>> Stashed changes
 
   PROCEDURE PROD_ROUTINE_TRIM IS
   BEGIN
@@ -485,20 +379,6 @@ CREATE OR REPLACE PACKAGE BODY COMSPOC_DBA.PKG_TRIM_UTILS
     TRIM_PAR_EXEC_TASKS;
   EXCEPTION
     WHEN OTHERS THEN
-<<<<<<< Updated upstream
-      pkg_audit.log_error(lc_svn_id,
-                                  lv_proc_name,
-                                  lv_comment,
-                                  '',
-                                  $$PLSQL_UNIT,
-                                  $$PLSQL_LINE,
-                                  SQLCODE,
-                                  SQLERRM);
-  END prod_routine_trim;
-
-BEGIN
-  pkg_audit.log_pkg_init($$PLSQL_UNIT, lc_svn_id);
-=======
       PKG_AUDIT.LOG_ERROR(LC_SVN_ID,
                           LV_PROC_NAME,
                           LV_COMMENT,
@@ -511,6 +391,6 @@ BEGIN
 
 BEGIN
   PKG_AUDIT.LOG_PKG_INIT($$PLSQL_UNIT, LC_SVN_ID);
->>>>>>> Stashed changes
+
 END PKG_TRIM_UTILS;
 /
