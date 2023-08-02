@@ -62,7 +62,7 @@ BEGIN pkg_deploy_utils.pkg_info; END;
 PROMPT pkg_trim_utils_spec.sql
 @packages/pkg_trim_utils_spec.sql
 PROMPT pkg_trim_utils_other.sql
-@packages/pkg_trim_utils_other.sql
+@packages/pkg_trim_utils_other.sql &&1
 PROMPT pkg_trim_utils_body.sql
 @packages/pkg_trim_utils_body.sql
 PROMPT pkg_registry_spec.sql
