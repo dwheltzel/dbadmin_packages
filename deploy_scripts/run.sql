@@ -9,3 +9,4 @@ ALTER SESSION SET CURRENT_SCHEMA=&&schema_name;
 
 @deploy_scripts/create_base.sql &&schema_name
 
+
