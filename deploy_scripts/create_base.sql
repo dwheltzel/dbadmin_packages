@@ -67,5 +67,7 @@ PROMPT pkg_registry_other.sql
 PROMPT pkg_registry_body.sql
 @packages/pkg_registry_body.sql
 
+alter package PKG_TRIM_UTILS compile body;
+
 SPOOL OFF
 EXIT
