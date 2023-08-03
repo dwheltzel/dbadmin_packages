@@ -2,10 +2,10 @@
 -- Author: dheltzel
 
 SET serverout ON SIZE UNLIMITED
-SET feed OFF
 SET lines 150
 SET pages 0
 SET trimspool ON
+SET DEF OFF
 COL spool_name FOR a40 new_value spool_name
 SELECT 'InstallDeployUtils_'||db_unique_name||'_'||to_char(SYSDATE,'YYMMDDHH24MI')||'.sql' spool_name from v$database;
 SPOOL &spool_name
@@ -49,25 +49,30 @@ PROMPT pkg_audit_spec.sql
 PROMPT pkg_audit_other.sql
 @packages/pkg_audit_other.sql
 PROMPT pkg_audit_body.sql
+SHOW ERRORS
+
 @packages/pkg_audit_body.sql
 PROMPT pkg_deploy_utils_spec.sql
 @packages/pkg_deploy_utils_spec.sql
 PROMPT pkg_deploy_utils_body.sql
 @packages/pkg_deploy_utils_body.sql
+SHOW ERRORS
 
 -- Create extra packages
 PROMPT pkg_trim_utils_spec.sql
 @packages/pkg_trim_utils_spec.sql
 PROMPT pkg_trim_utils_body.sql
 @packages/pkg_trim_utils_body.sql
+SHOW ERRORS
+alter package PKG_TRIM_UTILS compile body;
+
 PROMPT pkg_registry_spec.sql
 @packages/pkg_registry_spec.sql
 PROMPT pkg_registry_other.sql
 @packages/pkg_registry_other.sql
 PROMPT pkg_registry_body.sql
 @packages/pkg_registry_body.sql
-
-alter package PKG_TRIM_UTILS compile body;
+SHOW ERRORS
 
 SPOOL OFF
 EXIT

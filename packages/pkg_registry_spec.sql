@@ -1,5 +1,3 @@
-SET DEFINE OFF
-
 CREATE OR REPLACE PACKAGE PKG_REGISTRY IS
   -- Author: dheltzel
   /*  Purpose : Provide generic but flexible access to key-values pairs
@@ -54,4 +52,4 @@ CREATE OR REPLACE PACKAGE PKG_REGISTRY IS
 
 END PKG_REGISTRY;
 /
-SHOW ERRORS
+
