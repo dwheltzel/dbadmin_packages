@@ -1,12 +1,12 @@
 -- File err_log.sql
 -- Author: dheltzel
 
-create table ERR_LOG_T
+CREATE TABLE ERR_LOG_T
 (
-  LOG_DATE     DATE DEFAULT SYSDATE NOT NULL,
-  USER_NAME    VARCHAR2(30) DEFAULT USER NOT NULL,
+  LOG_DATE     DATE DEFAULT ON NULL SYSDATE NOT NULL,
+  USER_NAME    VARCHAR2(30) DEFAULT ON NULL USER NOT NULL,
   ERROR_TYPE   VARCHAR2(30) DEFAULT 'PLSQL',
-  EDITION      VARCHAR2(30),
+  EDITION      VARCHAR2(30) DEFAULT ON NULL 'ORA$BASE' NOT NULL,
   PROC_NAME    VARCHAR2(30),
   ERROR_LOC    VARCHAR2(2000),
   ERROR_DATA   VARCHAR2(2000),
@@ -19,21 +19,28 @@ create table ERR_LOG_T
   SQLCODE      VARCHAR2(30),
   SQLERRM      VARCHAR2(4000)
 )
-PARTITION BY RANGE(LOG_DATE) INTERVAL(numtoyminterval(1,'MONTH')) 
+PARTITION BY RANGE(LOG_DATE) INTERVAL(NUMTOYMINTERVAL(1,'MONTH')) 
 (
- PARTITION error_log_2023_10 VALUES LESS THAN (to_date('2023-11-01','YYYY-MM-DD')) 
+ PARTITION error_log_2023_10 VALUES LESS THAN (TO_DATE('2023-11-01','YYYY-MM-DD')) 
 );
 
-comment on table ERR_LOG_T is 'Repository of database application errors';
-comment on column ERR_LOG_T.LOG_DATE is 'Time that error occured';
-comment on column ERR_LOG_T.USER_NAME is 'Login name of the session - sys_context(''USERENV'', ''SESSION_USER'')';
-comment on column ERR_LOG_T.ERROR_TYPE is 'Type of error - default to PL/SQL code error';
-comment on column ERR_LOG_T.PROC_NAME is 'Name of the procedure being invoked';
-comment on column ERR_LOG_T.ERROR_LOC is 'Comment set in code to help locate code section with error';
-comment on column ERR_LOG_T.ERROR_DATA is 'Data values optionally sent to help debug error';
-comment on column ERR_LOG_T.SQLCODE is 'Value of SQLCODE';
-comment on column ERR_LOG_T.SQLERRM is 'Value of SQLERRM';
+COMMENT ON TABLE ERR_LOG_T IS 'Repository of database application errors';
+COMMENT ON COLUMN ERR_LOG_T.LOG_DATE IS 'Time that error occured';
+COMMENT ON COLUMN ERR_LOG_T.USER_NAME IS 'Login name of the USER';
+COMMENT ON COLUMN ERR_LOG_T.ERROR_TYPE IS 'Type of error - default to PL/SQL code error';
+COMMENT ON COLUMN ERR_LOG_T.EDITION IS 'Edition this process was run in';
+COMMENT ON COLUMN ERR_LOG_T.PROC_NAME IS 'Name of the procedure being invoked';
+COMMENT ON COLUMN ERR_LOG_T.ERROR_LOC IS 'Comment set in code to help locate code section with error';
+COMMENT ON COLUMN ERR_LOG_T.ERROR_DATA IS 'Data values optionally sent to help debug error';
+COMMENT ON COLUMN ERR_LOG_T.SOURCE_FILE IS 'Package source file';
+COMMENT ON COLUMN ERR_LOG_T.REVISION IS 'Package revision';
+COMMENT ON COLUMN ERR_LOG_T.REV_AUTHOR IS 'Author of this revision';
+COMMENT ON COLUMN ERR_LOG_T.REV_DATE IS 'Date of this revision';
+COMMENT ON COLUMN ERR_LOG_T.PLSQL_UNIT IS 'Name of the PL/SQL code, if applicable';
+COMMENT ON COLUMN ERR_LOG_T.PLSQL_LINE IS 'Line number in the PL/SQL code, if applicable';
+COMMENT ON COLUMN ERR_LOG_T.SQLCODE IS 'Value of SQLCODE';
+COMMENT ON COLUMN ERR_LOG_T.SQLERRM IS 'Value of SQLERRM';
 
-create index ERR_LOG_DATE on ERR_LOG_T (LOG_DATE);
+CREATE INDEX ERR_LOG_DATE_USER_IDX ON ERR_LOG_T (LOG_DATE, USER_NAME) LOCAL;
 
 CREATE OR REPLACE VIEW ERR_LOG AS select * from ERR_LOG_T;
